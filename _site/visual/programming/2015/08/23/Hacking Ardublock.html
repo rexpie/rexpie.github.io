@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Hacking Ardublock</title>
+  <meta name="description" content="Adding an extension to Ardublock">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://rexpie.github.io/visual/programming/2015/08/23/Hacking%20Ardublock.html">
+  <link rel="alternate" type="application/rss+xml" title="Rexie's Blog" href="http://rexpie.github.io/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Rexie's Blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Hacking Ardublock</h1>
+    <p class="post-meta">Aug 23, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <h2>Adding an extension to Ardublock</h2>
+
+<p>Extended From: <a href="http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/">How to hack ardublock</a></p>
+
+<h3>Handling the dependencies</h3>
+
+<ol>
+<li>Fork and clone Arduino form github</li>
+<li>Import openblocks and Ardublock into eclipse</li>
+<li>Import arduino-builder,arduino-dore and processing from Arduino project into eclipse</li>
+<li>Modify the buildpath of Ardublock and add the above 3 projects as dependency. Add openblocks and an dependency as well.</li>
+<li>Modify pom.xml in Ardublock，delete openblocks and Arduino dependency entries(They became obsolete over time and was no longer maintained)</li>
+<li>Continue to delete the install-arduino-pde execution entry in pom.xml</li>
+</ol>
+
+
+<p>You should now see no compiling errors within the projects. You may have a few warnings about the java compiler version. Just change the compilation configs to make eclipse happy.</p>
+
+<p>**If you are using other IDEs like IntelliJ, please use your own judgement to appropriately adapt the steps.</p>
+
+<h3>Adding an LED module</h3>
+
+<p>You can use the Ardublock article to do the same, here are some basic ideas:</p>
+
+<ol>
+<li>Add one BlockGenus with your own parameters</li>
+<li>Register the BlockGenus into one BlockDrawer so that you'll see the newly added module in the GUI, inside the designated drawer menu.</li>
+<li>If you need new image, tag or other custom resources to go with the new module, you need to add them to the resources folder, with i18n entries. Modify the <code>ardublock&lt;_{country_code}&gt;.properties</code> i18n file to achieve that.</li>
+<li>Modify block-mapping.properties and point the module to use the corresponding <code>Translator</code> Java class. You need to extend the <code>Translator</code> class if you want to dive in deeper.</li>
+</ol>
+
+
+<h3>Export and install</h3>
+
+<ol>
+<li>Right click Ardublock and Openblocks projects and export a jar package</li>
+<li>You need to check the <code>export with all resources</code> checkbox to include the image and configuration files.</li>
+<li>Put your jar into the Arduino tools folder. Be careful with the folder names as one of them is said to be case sensitive. See the <a href="http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/">official tutorial</a> for sure.</li>
+</ol>
+
+
+<h3>Test</h3>
+
+<ol>
+<li>Open the Arduino installation folder</li>
+<li>Run Arduino-debug and you can see the logs in the console window.</li>
+<li>Click on <code>Tools</code>-><code>Ardublock</code></li>
+<li>Drag your new module and test the functions.</li>
+</ol>
+
+
+<h2>Adding an I2C module</h2>
+
+<p><strong><em>You need to know how to add your custom header file and c++ file</em></strong></p>
+
+<p>If you want to use I2C modules like an I2C mounted 1602 LCD, you need to add the I2C c++ libraries for easier coding. The original Ardublock can only generate a single ino file. Here is how:</p>
+
+<ol>
+<li>First you create your new module, of course. See steps above. Let's call the new module I2C.</li>
+<li>Modify the <code>Translator</code> base class and add a <code>customHeaderFileSet</code> private member, maybe next to its own <code>headerFileSet</code> member.</li>
+<li>Add a <code>addCustomHeaderFile</code> API for clients and derived classes to manipulate the <code>customHeaderFileSet</code></li>
+<li>Modify your I2C module and call your API to add the custom header and/or c++ file.</li>
+</ol>
+
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">translator</span><span class="o">.</span><span class="na">addCustomHeaderFile</span><span class="o">(</span><span class="s">&quot;LiquidCrystal_I2C.h&quot;</span><span class="o">);</span></code></pre></div>
+
+
+<ol>
+<li>Import your header files and cpp file to eclipse. You should keep them well in your classpath.</li>
+<li>Next you need to use file manipulation to read from your jar file, and write the file stream into the Aruino temp project location. You don't want to write to the destination, since they would clobber the source file to import.</li>
+<li>Find the Aruino <code>Editor</code> instance along the <code>Context</code> instance and open your temp header and/or c++ file.</li>
+<li>Set the editor to the ino file, or else your translated text will be writing to the last file you opened by default.</li>
+</ol>
+
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Sketch</span> <span class="n">sketch</span> <span class="o">=</span> <span class="n">Context</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getEditor</span><span class="o">().</span><span class="na">getSketch</span><span class="o">();</span>
+<span class="n">File</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">sketch</span><span class="o">.</span><span class="na">getFolder</span><span class="o">().</span><span class="na">getParentFile</span><span class="o">();</span>
+<span class="n">File</span> <span class="n">header</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">folder</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">()</span> <span class="o">+</span> <span class="n">File</span><span class="o">.</span><span class="na">separator</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">);</span>
+<span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">getClass</span><span class="o">().</span><span class="na">getResource</span><span class="o">(</span><span class="s">&quot;/com/ardublock/translator/block/dfrobot/&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">).</span><span class="na">openStream</span><span class="o">();</span>
+<span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FileOutputStream</span><span class="o">(</span><span class="n">header</span><span class="o">);</span>
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4096</span><span class="o">];</span>
+<span class="kt">int</span> <span class="n">bytesRead</span><span class="o">;</span>
+<span class="k">while</span> <span class="o">((</span><span class="n">bytesRead</span> <span class="o">=</span> <span class="n">is</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">bytesRead</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="n">is</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="n">os</span><span class="o">.</span><span class="na">close</span><span class="o">();</span></code></pre></div>
+
+
+<h2>Conclusion</h2>
+
+<p>You can easily add new module for <strong>simple input and output</strong>.
+You have to drill down to the <code>Translator</code> core for advanced code generation, but it is not a very difficult task because the source code is quite well orgnized. Thumbs up to the <a href="http://blog.ardublock.com">Arublock</a> team.</p>
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Rexie's Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Rexie's Blog</li>
+          <li><a href="mailto:rexpie@gmail.com">rexpie@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/rexpie">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">rexpie</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Experiences, pitfalls and records of baby steps of IOT, hardware, Arduino.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
