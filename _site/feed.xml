@@ -1,14 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Rexie&#39;s Blog</title>
-    <description>Experiences, pitfalls and records of baby steps of IOT, hardware, Arduino.
+    <title>Rex&#39;s Blog</title>
+    <description>Soft sides and blind spots of IOT, hardware, Arduino.
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Aug 2015 23:20:55 +0800</pubDate>
-    <lastBuildDate>Sat, 22 Aug 2015 23:20:55 +0800</lastBuildDate>
+    <pubDate>Sun, 23 Aug 2015 14:46:33 +0800</pubDate>
+    <lastBuildDate>Sun, 23 Aug 2015 14:46:33 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Extending Scratch</title>
+        <description>&lt;h2&gt;Why Scratch&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://scratch.mit.edu/&quot;&gt;Scratch2&lt;/a&gt; is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.&lt;/p&gt;
+
+&lt;p&gt;We focus on how to leverage Scratch to further enable hardware interaction for the young.&lt;/p&gt;
+
+&lt;p&gt;The challenge is extending Scratch and make it talk to the various boards and devices.&lt;/p&gt;
+
+&lt;h2&gt;But How?&lt;/h2&gt;
+
+&lt;p&gt;Here is the architecture of the Scratch extension module. Note this is still under development by the Scratch team and is subject to change.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Scratch2.png&quot; title=&quot;Scratch Architecture&quot; alt=&quot;Scratch arch&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can also check the &lt;a href=&quot;http://wiki.scratch.mit.edu/wiki/Scratch_Extension&quot;&gt;official extension wiki&lt;/a&gt; to get the latest updated info.&lt;/p&gt;
+
+&lt;h2&gt;What else?&lt;/h2&gt;
+
+&lt;p&gt;As you can see in the architecture diagram, you will need a &lt;strong&gt;helper app&lt;/strong&gt; to enable the communication as Scratch does not speak on channels other than the &lt;code&gt;HTTP&lt;/code&gt; protocol.&lt;/p&gt;
+
+&lt;p&gt;What you need is a third party, preferrably open sourced project to do that. Your helper app should act as an &lt;code&gt;HTTP proxy&lt;/code&gt; and talk to Scratch &lt;strong&gt;AND&lt;/strong&gt; it should also be able to talk to the board via serial ports.&lt;/p&gt;
+
+&lt;h2&gt;Who&#39;s doing this&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s take a look at some open source initiatives&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://johnny-five.io&quot;&gt;johnny-five&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/MrYsLab/s2a_fm&quot;&gt;s2a_fm&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt; Both projct is based on the &lt;a href=&quot;http://firmata.org/&quot;&gt;Firmata&lt;/a&gt; protocol.&lt;/p&gt;
+
+&lt;h3&gt;johnny-five&lt;/h3&gt;
+
+&lt;p&gt;This popular project is node-js based. Highly configurable, actively maintained and very popular. You can leverage the server module of the nodejs project and easily put together a helper app with very little code.&lt;/p&gt;
+
+&lt;p&gt;Some sample code:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;johnny-five&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;ready&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;blink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;s2a_fm&lt;/h3&gt;
+
+&lt;p&gt;This project bases on PyMata, a firmata Python client. It already integrated the server request handling and Firmata communication. You can extend the existing modules within the framework relatively easily.&lt;/p&gt;
+
+&lt;p&gt;Here is a &lt;a href=&quot;https://www.youtube.com/watch?v=tUv_Uu_SqZk&quot;&gt;video&lt;/a&gt; for s2a_fm based project&lt;/p&gt;
+
+&lt;p&gt;You can choose whichever project you are comfortable with.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 23 Aug 2015 18:55:00 +0800</pubDate>
+        <link>http://rexpie.github.io/visual/programming/2015/08/23/extending-scratch.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/visual/programming/2015/08/23/extending-scratch.html</guid>
+        
+        
+        <category>visual</category>
+        
+        <category>programming</category>
+        
+      </item>
     
       <item>
         <title>Hacking Ardublock</title>

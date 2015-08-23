@@ -1,8 +1,8 @@
 # Site settings
-title: Rexie's Blog
+title: Rex's Blog
 email: rexpie@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  Experiences, pitfalls and records of baby steps of IOT, hardware, Arduino.
+  Soft sides and blind spots of IOT, hardware, Arduino.
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://rexpie.github.io" # the base hostname & protocol for your site
 
