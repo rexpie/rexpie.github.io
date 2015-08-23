@@ -3,7 +3,7 @@ title: Rexie's Blog
 email: rexpie@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Experiences, pitfalls and records of baby steps of IOT, hardware, Arduino.
-baseurl: "/blog/" # the subpath of your site, e.g. /blog/
+baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://rexpie.github.io" # the base hostname & protocol for your site
 
 github_username:  rexpie
