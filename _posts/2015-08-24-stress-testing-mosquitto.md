@@ -29,7 +29,7 @@ I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu 
 
 Here are the steps to execute the stress test. I can give you the results beforehand:
 
-It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.
+> It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.
 
 
 ## Changing System File Limitations

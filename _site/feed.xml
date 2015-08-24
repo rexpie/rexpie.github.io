@@ -6,8 +6,8 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 24 Aug 2015 21:51:19 +0800</pubDate>
-    <lastBuildDate>Mon, 24 Aug 2015 21:51:19 +0800</lastBuildDate>
+    <pubDate>Mon, 24 Aug 2015 21:57:32 +0800</pubDate>
+    <lastBuildDate>Mon, 24 Aug 2015 21:57:32 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -41,7 +41,7 @@
 
 &lt;p&gt;Here are the steps to execute the stress test. I can give you the results beforehand:&lt;/p&gt;
 
-&lt;p&gt;It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.&lt;/p&gt;&lt;/blockquote&gt;
 
 &lt;h2&gt;Changing System File Limitations&lt;/h2&gt;
 
