@@ -63,6 +63,7 @@ If you want to use the latest version, go to their official download [link](http
 Or if you want to quickly install a curated version for you system, you can also check out their recipes in the same page.
 
 I built the server from its source. I found out that I need:
+
 * g++
 * uuid-dev
 * libc-ares-dev
