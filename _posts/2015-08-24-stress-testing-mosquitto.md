@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Stress testing Mosquitto"
+title:  "Stress testing Mosquitto MQTT Broker"
 date:   2015-08-23 10:55:00
 categories: mqtt
 ---
@@ -9,20 +9,25 @@ categories: mqtt
 
 I am testing the server under a very **specific** scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.
 
-* It is written in C, with tiny memory footprints for each connection, unlike Apache's ActiveMQ or Apollo which creates a thread object
+* It is written in C, with tiny memory footprints for each connection, unlike Apache's ActiveMQ or Apollo which creates a thread object for every live connection.
 * It is single threaded
 * It is easy to install, simple to configure and quick to run
 
 I am not saying other brokers are not superior on those aspects. Simplicity is what I am after and after all, I think that managing a network of broker cluster exceeds the boundary of software design and need system architecture behind it. So I want to start with simple tests on a single server and see how it goes.
 
+Here is an [article](http://w3yyb.sinaapp.com/archives/1601) ~~in Chinese~~ of an emperical study on MQTT broker performances. Basic translation of the conclusion is: 
+
+* Downsides: Mosquitto only utilizes one CPU; EMQTT writes too much disk io and has low throughput; ActiveMQ/Apollo eats a lot of RAM and sometimes crashes.
+* Upsides: EMQTT & Mosquitto are quite stable. EMQTT has high cuncurrent connection counts. Apache ones can use multicore.
+
 
 # Prerequisites
 
-I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let's call them Alice and Bob.
+I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let's call them *Alice* and *Bob*.
 
 # Setting up the environment
 
-Here are the steps to execute the stress test. I can give you the results before hand:
+Here are the steps to execute the stress test. I can give you the results beforehand:
 
 It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.
 
@@ -106,4 +111,6 @@ You can also check the network connections using:
 
 ## Conclusion
 
-I already gave the results. Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.
+I already gave the results. 
+
+`//TODO` Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.

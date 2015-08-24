@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Stress testing Mosquitto</title>
+  <title>Stress testing Mosquitto MQTT Broker</title>
   <meta name="description" content="What am I testing for">
 
   <link rel="stylesheet" href="/css/main.css">
@@ -67,7 +67,7 @@
         <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Stress testing Mosquitto</h1>
+    <h1 class="post-title">Stress testing Mosquitto MQTT Broker</h1>
     <p class="post-meta">Aug 23, 2015</p>
   </header>
 
@@ -77,7 +77,7 @@
 <p>I am testing the server under a very <strong>specific</strong> scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.</p>
 
 <ul>
-<li>It is written in C, with tiny memory footprints for each connection, unlike Apache's ActiveMQ or Apollo which creates a thread object</li>
+<li>It is written in C, with tiny memory footprints for each connection, unlike Apache's ActiveMQ or Apollo which creates a thread object for every live connection.</li>
 <li>It is single threaded</li>
 <li>It is easy to install, simple to configure and quick to run</li>
 </ul>
@@ -85,13 +85,21 @@
 
 <p>I am not saying other brokers are not superior on those aspects. Simplicity is what I am after and after all, I think that managing a network of broker cluster exceeds the boundary of software design and need system architecture behind it. So I want to start with simple tests on a single server and see how it goes.</p>
 
+<p>Here is an <a href="http://w3yyb.sinaapp.com/archives/1601">article</a> <del>in Chinese</del> of an emperical study on MQTT broker performances. Basic translation of the conclusion is:</p>
+
+<ul>
+<li>Downsides: Mosquitto only utilizes one CPU; EMQTT writes too much disk io and has low throughput; ActiveMQ/Apollo eats a lot of RAM and sometimes crashes.</li>
+<li>Upsides: EMQTT &amp; Mosquitto are quite stable. EMQTT has high cuncurrent connection counts. Apache ones can use multicore.</li>
+</ul>
+
+
 <h1>Prerequisites</h1>
 
-<p>I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let's call them Alice and Bob.</p>
+<p>I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let's call them <em>Alice</em> and <em>Bob</em>.</p>
 
 <h1>Setting up the environment</h1>
 
-<p>Here are the steps to execute the stress test. I can give you the results before hand:</p>
+<p>Here are the steps to execute the stress test. I can give you the results beforehand:</p>
 
 <p>It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.</p>
 
@@ -168,7 +176,9 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 <h2>Conclusion</h2>
 
-<p>I already gave the results. Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.</p>
+<p>I already gave the results.</p>
+
+<p><code>//TODO</code> Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.</p>
 
   </article>
 

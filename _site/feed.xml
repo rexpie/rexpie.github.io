@@ -6,18 +6,18 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 24 Aug 2015 18:20:59 +0800</pubDate>
-    <lastBuildDate>Mon, 24 Aug 2015 18:20:59 +0800</lastBuildDate>
+    <pubDate>Mon, 24 Aug 2015 21:51:19 +0800</pubDate>
+    <lastBuildDate>Mon, 24 Aug 2015 21:51:19 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
-        <title>Stress testing Mosquitto</title>
+        <title>Stress testing Mosquitto MQTT Broker</title>
         <description>&lt;h1&gt;What am I testing for&lt;/h1&gt;
 
 &lt;p&gt;I am testing the server under a very &lt;strong&gt;specific&lt;/strong&gt; scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;It is written in C, with tiny memory footprints for each connection, unlike Apache&#39;s ActiveMQ or Apollo which creates a thread object&lt;/li&gt;
+&lt;li&gt;It is written in C, with tiny memory footprints for each connection, unlike Apache&#39;s ActiveMQ or Apollo which creates a thread object for every live connection.&lt;/li&gt;
 &lt;li&gt;It is single threaded&lt;/li&gt;
 &lt;li&gt;It is easy to install, simple to configure and quick to run&lt;/li&gt;
 &lt;/ul&gt;
@@ -25,13 +25,21 @@
 
 &lt;p&gt;I am not saying other brokers are not superior on those aspects. Simplicity is what I am after and after all, I think that managing a network of broker cluster exceeds the boundary of software design and need system architecture behind it. So I want to start with simple tests on a single server and see how it goes.&lt;/p&gt;
 
+&lt;p&gt;Here is an &lt;a href=&quot;http://w3yyb.sinaapp.com/archives/1601&quot;&gt;article&lt;/a&gt; &lt;del&gt;in Chinese&lt;/del&gt; of an emperical study on MQTT broker performances. Basic translation of the conclusion is:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Downsides: Mosquitto only utilizes one CPU; EMQTT writes too much disk io and has low throughput; ActiveMQ/Apollo eats a lot of RAM and sometimes crashes.&lt;/li&gt;
+&lt;li&gt;Upsides: EMQTT &amp;amp; Mosquitto are quite stable. EMQTT has high cuncurrent connection counts. Apache ones can use multicore.&lt;/li&gt;
+&lt;/ul&gt;
+
+
 &lt;h1&gt;Prerequisites&lt;/h1&gt;
 
-&lt;p&gt;I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let&#39;s call them Alice and Bob.&lt;/p&gt;
+&lt;p&gt;I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let&#39;s call them &lt;em&gt;Alice&lt;/em&gt; and &lt;em&gt;Bob&lt;/em&gt;.&lt;/p&gt;
 
 &lt;h1&gt;Setting up the environment&lt;/h1&gt;
 
-&lt;p&gt;Here are the steps to execute the stress test. I can give you the results before hand:&lt;/p&gt;
+&lt;p&gt;Here are the steps to execute the stress test. I can give you the results beforehand:&lt;/p&gt;
 
 &lt;p&gt;It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.&lt;/p&gt;
 
@@ -108,7 +116,9 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;I already gave the results. Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.&lt;/p&gt;
+&lt;p&gt;I already gave the results.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;//TODO&lt;/code&gt; Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.&lt;/p&gt;
 </description>
         <pubDate>Sun, 23 Aug 2015 18:55:00 +0800</pubDate>
         <link>http://rexpie.github.io/mqtt/2015/08/23/stress-testing-mosquitto.html</link>
