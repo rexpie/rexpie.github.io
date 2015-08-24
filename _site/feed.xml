@@ -6,9 +6,118 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 23 Aug 2015 14:50:22 +0800</pubDate>
-    <lastBuildDate>Sun, 23 Aug 2015 14:50:22 +0800</lastBuildDate>
+    <pubDate>Mon, 24 Aug 2015 18:20:59 +0800</pubDate>
+    <lastBuildDate>Mon, 24 Aug 2015 18:20:59 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Stress testing Mosquitto</title>
+        <description>&lt;h1&gt;What am I testing for&lt;/h1&gt;
+
+&lt;p&gt;I am testing the server under a very &lt;strong&gt;specific&lt;/strong&gt; scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;It is written in C, with tiny memory footprints for each connection, unlike Apache&#39;s ActiveMQ or Apollo which creates a thread object&lt;/li&gt;
+&lt;li&gt;It is single threaded&lt;/li&gt;
+&lt;li&gt;It is easy to install, simple to configure and quick to run&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;I am not saying other brokers are not superior on those aspects. Simplicity is what I am after and after all, I think that managing a network of broker cluster exceeds the boundary of software design and need system architecture behind it. So I want to start with simple tests on a single server and see how it goes.&lt;/p&gt;
+
+&lt;h1&gt;Prerequisites&lt;/h1&gt;
+
+&lt;p&gt;I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let&#39;s call them Alice and Bob.&lt;/p&gt;
+
+&lt;h1&gt;Setting up the environment&lt;/h1&gt;
+
+&lt;p&gt;Here are the steps to execute the stress test. I can give you the results before hand:&lt;/p&gt;
+
+&lt;p&gt;It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.&lt;/p&gt;
+
+&lt;h2&gt;Changing System File Limitations&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Do this on both Alice and Bob &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Your system may restrice open files per process and system-wide file handle counts.&lt;/p&gt;
+
+&lt;p&gt;I found a &lt;a href=&quot;https://rtcamp.com/tutorials/linux/increase-open-files-limit/&quot;&gt;tutorial&lt;/a&gt; for linux/Unix like systems.&lt;/p&gt;
+
+&lt;p&gt;Basically you edit &lt;code&gt;/etc/security/limits.conf&lt;/code&gt; and put in:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;*         hard    nofile      500000&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;*         soft    nofile      500000&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;You may also need to modify &lt;code&gt;/etc/sysctl.conf&lt;/code&gt; and put in:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;fs.file-max = 2097152&lt;/code&gt; and run &lt;code&gt;sysctl -p&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;sudo if necessary&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2&gt;Mosquitto Server&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Do this on Alice &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If you want to use the latest version, go to their official download &lt;a href=&quot;http://mosquitto.org/download/&quot;&gt;link&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Or if you want to quickly install a curated version for you system, you can also check out their recipes in the same page.&lt;/p&gt;
+
+&lt;p&gt;I built the server from its source. I found out that I need:
+* g++
+* uuid-dev
+* libc-ares-dev
+* libssl-dev&lt;/p&gt;
+
+&lt;p&gt;Then you can execute &lt;code&gt;make &amp;amp;&amp;amp; sudo make install&lt;/code&gt; and check if you have &lt;code&gt;mosquitto&lt;/code&gt; available after that.&lt;/p&gt;
+
+&lt;h2&gt;Configuring and Starting Mosquitto&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Do this on Alice &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;You can refer the &lt;a href=&quot;http://mosquitto.org/man/mosquitto-conf-5.html&quot;&gt;documentation&lt;/a&gt; for the detailed parameters, but I focus on the &lt;code&gt;max_connections&lt;/code&gt; configuration value and change it to &lt;code&gt;-1&lt;/code&gt;(unlimited)&lt;/p&gt;
+
+&lt;p&gt;Then just execute &lt;code&gt;mosquitto&lt;/code&gt;. You can add the &lt;code&gt;-d&lt;/code&gt; switch to run it in the background. I just like to see the logs.&lt;/p&gt;
+
+&lt;h2&gt;Benchmark tool&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Do this on Bob &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I used a pretty cool tool called &lt;a href=&quot;https://github.com/takanorig/mqtt-bench&quot;&gt;mqtt-bench&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I can&#39;t get it to work using the &lt;code&gt;go get&lt;/code&gt; command in its documentation, so I downloaded the &lt;a href=&quot;https://github.com/takanorig/mqtt-bench/wiki/Download&quot;&gt;binary&lt;/a&gt; as it advised.&lt;/p&gt;
+
+&lt;h2&gt;Starting Test&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Do this on Bob &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The CLI command for the benchmark tool looks like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;./mqtt-bench  -action=p -broker=&quot;tcp://192.168.0.89:1883&quot; -clients=20000 -count=10&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2&gt;Checking Status on Alice&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt; Of course do this on Alice &lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;You can use the &lt;code&gt;top&lt;/code&gt; command to see the CPU and memory usage of Alice.
+For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12M ) when the connections are being accepted.&lt;/p&gt;
+
+&lt;p&gt;You can also check the network connections using:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;netstat -pant | grep mosquitto | wc -l&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I already gave the results. Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 23 Aug 2015 18:55:00 +0800</pubDate>
+        <link>http://rexpie.github.io/mqtt/2015/08/23/stress-testing-mosquitto.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/mqtt/2015/08/23/stress-testing-mosquitto.html</guid>
+        
+        
+        <category>mqtt</category>
+        
+      </item>
     
       <item>
         <title>Extending Scratch</title>
