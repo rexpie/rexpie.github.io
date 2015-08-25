@@ -1,8 +1,7 @@
 ---
 layout: post
 title:  "Hacking Ardublock"
-date:   2015-08-22 21:55:00
-categories: Visual Programming
+tags: Visual Programming
 ---
 ## Adding an extension to Ardublock
 

@@ -1,8 +1,7 @@
 ---
 layout: post
 title:  "Extending Scratch"
-date:   2015-08-23 10:55:00
-categories: Visual Programming
+tags: Visual Programming
 ---
 
 

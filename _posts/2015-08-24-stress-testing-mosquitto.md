@@ -2,7 +2,7 @@
 layout: post
 title:  "Stress testing Mosquitto MQTT Broker"
 date:   2015-08-23 10:55:00
-categories: mqtt
+tags: mqtt mosquitto
 ---
 
 # What am I testing for
