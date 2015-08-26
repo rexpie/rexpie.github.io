@@ -69,7 +69,11 @@ I built the server from its source. I found out that I need:
 * libc-ares-dev
 * libssl-dev
 
-Then you can execute `make && sudo make install` and check if you have `mosquitto` available after that.
+Then you can execute 
+
+    make && sudo make install
+    
+and check if you have `mosquitto` available after that.
 
 ## Configuring and Starting Mosquitto
 
@@ -95,7 +99,7 @@ I can't get it to work using the `go get` command in its documentation, so I dow
 
 The CLI command for the benchmark tool looks like this:
 
-`./mqtt-bench  -action=p -broker="tcp://192.168.0.89:1883" -clients=20000 -count=10`
+    ./mqtt-bench  -action=p -broker="tcp://192.168.0.89:1883" -clients=20000 -count=10
 
 
 ## Checking Status on Alice
@@ -107,7 +111,7 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 You can also check the network connections using:
 
-`netstat -pant | grep mosquitto | wc -l`
+    netstat -pant | grep mosquitto | wc -l
 
 
 ## Conclusion

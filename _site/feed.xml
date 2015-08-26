@@ -6,8 +6,8 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 26 Aug 2015 11:43:07 +0800</pubDate>
-    <lastBuildDate>Wed, 26 Aug 2015 11:43:07 +0800</lastBuildDate>
+    <pubDate>Wed, 26 Aug 2015 16:49:03 +0800</pubDate>
+    <lastBuildDate>Wed, 26 Aug 2015 16:49:03 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -82,10 +82,9 @@
 
 &lt;p&gt;When I tried to execute the &lt;code&gt;mosquitto_pub&lt;/code&gt; command, it complains about a lib missing:&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;rex@ubuntu:~$ mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;&lt;/code&gt;
-&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot open shared object file: No such file or directory&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
+mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot open shared object file: No such file or directory
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;I &lt;strong&gt;built&lt;/strong&gt; this from source. Well seems like mosquitto needs a bit more consistent at housekeeping when it tries to install and execute.&lt;/p&gt;
 
@@ -93,33 +92,27 @@
 
 &lt;p&gt;First use strace to look what it is looking for:&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;rex@ubuntu:~$ strace mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;&lt;/code&gt;
-&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;open(&quot;/usr/lib/x86_64/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;stat(&quot;/usr/lib/x86_64&quot;, 0x7fff1e3b13f0) = -1 ENOENT (No such file or directory)
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ strace mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
+open(&quot;/usr/lib/x86_64/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat(&quot;/usr/lib/x86_64&quot;, 0x7fff1e3b13f0) = -1 ENOENT (No such file or directory)
+open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Okay so it looks through &lt;code&gt;/usr/lib&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Where &lt;strong&gt;is&lt;/strong&gt; the lib then?&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;rex@ubuntu:~$ locate libmosquitto.so|xargs ls -l&lt;/code&gt;
-&lt;/strong&gt;
-&lt;code&gt;/usr/local/lib/libmosquitto.so
+&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ locate libmosquitto.so|xargs ls -l
+/usr/local/lib/libmosquitto.so
 /usr/local/lib/libmosquitto.so.1
-&lt;/code&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;So it looks at &lt;code&gt;/usr/lib&lt;/code&gt; rather than &lt;code&gt;/usr/local/lib&lt;/code&gt;. Fair enough, I did not specify the prefix when building.&lt;/p&gt;
 
 &lt;p&gt;Fix is easy:&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1
+&lt;/code&gt;&lt;/pre&gt;
 </description>
         <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/08/25/mosquitto-troubleshooting.html</link>
@@ -203,7 +196,12 @@
 &lt;/ul&gt;
 
 
-&lt;p&gt;Then you can execute &lt;code&gt;make &amp;amp;&amp;amp; sudo make install&lt;/code&gt; and check if you have &lt;code&gt;mosquitto&lt;/code&gt; available after that.&lt;/p&gt;
+&lt;p&gt;Then you can execute&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;make &amp;amp;&amp;amp; sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and check if you have &lt;code&gt;mosquitto&lt;/code&gt; available after that.&lt;/p&gt;
 
 &lt;h2&gt;Configuring and Starting Mosquitto&lt;/h2&gt;
 
@@ -227,7 +225,8 @@
 
 &lt;p&gt;The CLI command for the benchmark tool looks like this:&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;./mqtt-bench  -action=p -broker=&quot;tcp://192.168.0.89:1883&quot; -clients=20000 -count=10&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;./mqtt-bench  -action=p -broker=&quot;tcp://192.168.0.89:1883&quot; -clients=20000 -count=10
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;Checking Status on Alice&lt;/h2&gt;
 
@@ -238,7 +237,8 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 &lt;p&gt;You can also check the network connections using:&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;netstat -pant | grep mosquitto | wc -l&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;netstat -pant | grep mosquitto | wc -l
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 

@@ -141,7 +141,12 @@
 </ul>
 
 
-<p>Then you can execute <code>make &amp;&amp; sudo make install</code> and check if you have <code>mosquitto</code> available after that.</p>
+<p>Then you can execute</p>
+
+<pre><code>make &amp;&amp; sudo make install
+</code></pre>
+
+<p>and check if you have <code>mosquitto</code> available after that.</p>
 
 <h2>Configuring and Starting Mosquitto</h2>
 
@@ -165,7 +170,8 @@
 
 <p>The CLI command for the benchmark tool looks like this:</p>
 
-<p><code>./mqtt-bench  -action=p -broker="tcp://192.168.0.89:1883" -clients=20000 -count=10</code></p>
+<pre><code>./mqtt-bench  -action=p -broker="tcp://192.168.0.89:1883" -clients=20000 -count=10
+</code></pre>
 
 <h2>Checking Status on Alice</h2>
 
@@ -176,7 +182,8 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 <p>You can also check the network connections using:</p>
 
-<p><code>netstat -pant | grep mosquitto | wc -l</code></p>
+<pre><code>netstat -pant | grep mosquitto | wc -l
+</code></pre>
 
 <h2>Conclusion</h2>
 
