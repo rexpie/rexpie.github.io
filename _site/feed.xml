@@ -6,9 +6,75 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 25 Aug 2015 10:21:13 +0800</pubDate>
-    <lastBuildDate>Tue, 25 Aug 2015 10:21:13 +0800</lastBuildDate>
+    <pubDate>Wed, 26 Aug 2015 11:43:07 +0800</pubDate>
+    <lastBuildDate>Wed, 26 Aug 2015 11:43:07 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Load Balancing with HAProxy</title>
+        <description>&lt;h1&gt;Need to cluster&lt;/h1&gt;
+
+&lt;p&gt;IBM has a &lt;a href=&quot;http://www.redbooks.ibm.com/redbooks/pdfs/sg248054.pdf&quot;&gt;Redbook&lt;/a&gt; for its own IOT service environment. The book also described the topologies of enterprise MQTT service architectures. So, to cluster some mosquitto brokers, we need some other tools.&lt;/p&gt;
+
+&lt;p&gt;Mosquitto is a single thread process. To scale out, we need tools to better monitor and manage them.&lt;/p&gt;
+
+&lt;h1&gt;Cue in load balancing&lt;/h1&gt;
+
+&lt;p&gt;I followed the steps in this nice &lt;a href=&quot;https://serversforhackers.com/load-balancing-with-haproxy&quot;&gt;tutorial&lt;/a&gt;, others you googled might be just as good, as HAProxy is very easy to install, configure and run.&lt;/p&gt;
+
+&lt;p&gt;I changed the configuration to match our need for mqtt connections.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cfg&quot; data-lang=&quot;cfg&quot;&gt;&lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;mqtt&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1883&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcp&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;maxconn&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;200000&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcplog&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;redispatch&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;balance&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;leastconn&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv1&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.36:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv2&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.136:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
+
+&lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1936&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;enable&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Configurations explained&lt;/h2&gt;
+
+&lt;h2&gt;&lt;code&gt;option redispatch&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;This is used to tell HAProxy to retry to another backend server when one of the servers goes down, rather than giving a 503 error back to the fronted.&lt;/p&gt;
+
+&lt;h2&gt;&lt;code&gt;balance leastconn&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.&lt;/p&gt;
+
+&lt;h2&gt;Monitoring HAProxy&lt;/h2&gt;
+
+&lt;p&gt;The HAProxy comes with a handy web interface for quick monitoring. The stats block of the configuration shows how to do this. I left out the &lt;code&gt;auth&lt;/code&gt; config so I don&#39;t have to type in user name and password every now and then.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/haproxystat.png&quot; title=&quot;HAProxy Stats Screenshot&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;HAProxy can be used to load balance a cluster of single-threaded mosquitto servers in a LAN environment. We can even setup multiple clusters globally.&lt;/p&gt;
+
+&lt;p&gt;Next we maybe can try out the provisioning service as to auto configure the MQTT clients.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 26 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/08/26/loadbalancing-with-haproxy.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/26/loadbalancing-with-haproxy.html</guid>
+        
+        <category>haproxy,</category>
+        
+        <category>load</category>
+        
+        <category>balancing,</category>
+        
+        <category>mosquitto</category>
+        
+        
+      </item>
     
       <item>
         <title>Mosquitto Troubleshooting</title>

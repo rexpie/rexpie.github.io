@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Rex's Blog</title>
-  <meta name="description" content="Soft sides and blind spots of IOT, hardware, Arduino.
-">
+  <title>Load Balancing with HAProxy</title>
+  <meta name="description" content="Need to cluster">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://rexpie.github.io/">
+  <link rel="canonical" href="http://rexpie.github.io/2015/08/26/loadbalancing-with-haproxy.html">
   <link rel="alternate" type="application/rss+xml" title="Rex's Blog" href="http://rexpie.github.io/feed.xml" />
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -65,55 +64,64 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <div class="post">
 
-  <h1 class="page-heading">Posts</h1>
+  <header class="post-header">
+    <h1 class="post-title">Load Balancing with HAProxy</h1>
+    <p class="post-meta">Aug 26, 2015</p>
+  </header>
 
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Aug 26, 2015</span>
+  <article class="post-content">
+    <h1>Need to cluster</h1>
 
-        <h2>
-          <a class="post-link" href="/2015/08/26/loadbalancing-with-haproxy.html">Load Balancing with HAProxy</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 25, 2015</span>
+<p>IBM has a <a href="http://www.redbooks.ibm.com/redbooks/pdfs/sg248054.pdf">Redbook</a> for its own IOT service environment. The book also described the topologies of enterprise MQTT service architectures. So, to cluster some mosquitto brokers, we need some other tools.</p>
 
-        <h2>
-          <a class="post-link" href="/2015/08/25/mosquitto-troubleshooting.html">Mosquitto Troubleshooting</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 23, 2015</span>
+<p>Mosquitto is a single thread process. To scale out, we need tools to better monitor and manage them.</p>
 
-        <h2>
-          <a class="post-link" href="/2015/08/23/stress-testing-mosquitto.html">Stress testing Mosquitto MQTT Broker</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 23, 2015</span>
+<h1>Cue in load balancing</h1>
 
-        <h2>
-          <a class="post-link" href="/2015/08/23/extending-scratch.html">Extending Scratch</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 22, 2015</span>
+<p>I followed the steps in this nice <a href="https://serversforhackers.com/load-balancing-with-haproxy">tutorial</a>, others you googled might be just as good, as HAProxy is very easy to install, configure and run.</p>
 
-        <h2>
-          <a class="post-link" href="/2015/08/22/Hacking%20Ardublock.html">Hacking Ardublock</a>
-        </h2>
-      </li>
-    
-  </ul>
+<p>I changed the configuration to match our need for mqtt connections.</p>
 
-  <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
+<div class="highlight"><pre><code class="language-cfg" data-lang="cfg"><span class="err">listen</span> <span class="err">mqtt</span>
+  <span class="err">bind</span> <span class="err">*:1883</span>
+  <span class="err">mode</span> <span class="err">tcp</span>
+  <span class="err">maxconn</span> <span class="err">200000</span>
+  <span class="err">option</span> <span class="err">tcplog</span>
+  <span class="err">option</span> <span class="err">redispatch</span>
+  <span class="err">balance</span> <span class="err">leastconn</span>
+  <span class="err">server</span> <span class="err">serv1</span> <span class="err">192.168.0.36:1883</span> <span class="err">check</span>
+  <span class="err">server</span> <span class="err">serv2</span> <span class="err">192.168.0.136:1883</span> <span class="err">check</span>
+
+<span class="err">listen</span> <span class="err">stats</span> <span class="err">*:1936</span>
+  <span class="err">stats</span> <span class="err">enable</span>
+  <span class="err">stats</span> <span class="err">uri</span> <span class="err">/</span></code></pre></div>
+
+
+<h2>Configurations explained</h2>
+
+<h2><code>option redispatch</code></h2>
+
+<p>This is used to tell HAProxy to retry to another backend server when one of the servers goes down, rather than giving a 503 error back to the fronted.</p>
+
+<h2><code>balance leastconn</code></h2>
+
+<p>This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.</p>
+
+<h2>Monitoring HAProxy</h2>
+
+<p>The HAProxy comes with a handy web interface for quick monitoring. The stats block of the configuration shows how to do this. I left out the <code>auth</code> config so I don't have to type in user name and password every now and then.</p>
+
+<p><img src="http://rexpie.github.io/assets/haproxystat.png" title="HAProxy Stats Screenshot" alt="image" /></p>
+
+<h1>Conclusion</h1>
+
+<p>HAProxy can be used to load balance a cluster of single-threaded mosquitto servers in a LAN environment. We can even setup multiple clusters globally.</p>
+
+<p>Next we maybe can try out the provisioning service as to auto configure the MQTT clients.</p>
+
+  </article>
 
 </div>
 
