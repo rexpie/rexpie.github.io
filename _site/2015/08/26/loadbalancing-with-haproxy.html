@@ -86,13 +86,14 @@
 
 <div class="highlight"><pre><code class="language-cfg" data-lang="cfg"><span class="err">listen</span> <span class="err">mqtt</span>
   <span class="err">bind</span> <span class="err">*:1883</span>
+  <span class="err">bind</span> <span class="err">*:1884</span>
   <span class="err">mode</span> <span class="err">tcp</span>
   <span class="err">maxconn</span> <span class="err">200000</span>
   <span class="err">option</span> <span class="err">tcplog</span>
   <span class="err">option</span> <span class="err">redispatch</span>
   <span class="err">balance</span> <span class="err">leastconn</span>
-  <span class="err">server</span> <span class="err">serv1</span> <span class="err">192.168.0.36:1883</span> <span class="err">check</span>
-  <span class="err">server</span> <span class="err">serv2</span> <span class="err">192.168.0.136:1883</span> <span class="err">check</span>
+  <span class="err">server</span> <span class="err">serv1</span> <span class="err">192.168.0.36:1883</span> <span class="err">source</span> <span class="err">0.0.0.0:1024-65535</span> <span class="err">check</span>
+  <span class="err">server</span> <span class="err">serv2</span> <span class="err">192.168.0.136:1883</span> <span class="err">source</span> <span class="err">0.0.0.0:1024-65535</span> <span class="err">check</span>
 
 <span class="err">listen</span> <span class="err">stats</span> <span class="err">*:1936</span>
   <span class="err">stats</span> <span class="err">enable</span>
@@ -108,6 +109,12 @@
 <h2><code>balance leastconn</code></h2>
 
 <p>This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.</p>
+
+<h2><code>source 0.0.0.0:1024-65535</code></h2>
+
+<p>See this nice <a href="http://comments.gmane.org/gmane.comp.web.haproxy/5594">email exchange</a>, also see haproxy's <a href="https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4-source">configuration manual</a>.</p>
+
+<p>Basically,</p>
 
 <h2>Monitoring HAProxy</h2>
 

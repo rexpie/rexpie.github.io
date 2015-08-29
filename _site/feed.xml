@@ -6,9 +6,87 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 26 Aug 2015 16:49:03 +0800</pubDate>
-    <lastBuildDate>Wed, 26 Aug 2015 16:49:03 +0800</lastBuildDate>
+    <pubDate>Sat, 29 Aug 2015 14:27:27 +0800</pubDate>
+    <lastBuildDate>Sat, 29 Aug 2015 14:27:27 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Scratch with Johnny-five</title>
+        <description>&lt;h1&gt;Scratch Extension with Johnny-five&lt;/h1&gt;
+
+&lt;p&gt;Previous &lt;a href=&quot;http://rexpie.github.io/2015/08/23/extending-scratch.html&quot;&gt;article&lt;/a&gt; illustrated the architecture of the Scratch extension.&lt;/p&gt;
+
+&lt;p&gt;We can replace the PyMata part with anything that can act as a broker between Firmata and the HTTP.&lt;/p&gt;
+
+&lt;p&gt;Nodejs has a rich library and &lt;a href=&quot;http://johnny-five.io&quot;&gt;Johnny-five&lt;/a&gt;(J5) is one of the most popular Firmata clients. It is actively maintained by &lt;a href=&quot;https://github.com/rwaldron&quot;&gt;Rick Waldron&lt;/a&gt; as of this document is written.&lt;/p&gt;
+
+&lt;p&gt;I was amazed by how Rick handles issues with chips. I told him one of the LCD chip is not working well with j5 &lt;a href=&quot;https://github.com/rwaldron/johnny-five/issues/326#issuecomment-135857146&quot;&gt;link&lt;/a&gt;. He said the would buy that chip online and test it after. He did things like this multiple times on other occasions as well. Hats off.&lt;/p&gt;
+
+&lt;h1&gt;Let&#39;s do this&lt;/h1&gt;
+
+&lt;p&gt;I want to build a version that works on Windows to start. Both x64 and x86 OS should be able to execute the binaries.&lt;/p&gt;
+
+&lt;p&gt;Why does this matter? Isn&#39;t Nodejs cross platform?&lt;/p&gt;
+
+&lt;p&gt;Because we need to talk through the serial port. J5 depends on &lt;a href=&quot;https://www.npmjs.com/package/serialport&quot;&gt;serialport&lt;/a&gt; package and usually it need compiling. The documents of &lt;code&gt;serialport&lt;/code&gt; package has detailed instructions as how to deal with &#39;build fail&#39; issues.&lt;/p&gt;
+
+&lt;h2&gt;Dependencies&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Nodejs x86 version for compatibility&lt;/li&gt;
+&lt;li&gt;Python 2.* matching OS bitness ( 32 for 32bit OS, 64 for 64bit OS)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;After you get your nodejs and python ready, remember to put the bin path into your PATH variable. Then you create a project path for the helper app. Let&#39;s call it 5jhelper.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd j5helper
+npm install johnny-five
+npm install serialport
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sometimes serialport will install successfully with johnny-five. If serialport failed to install, best solution would be RTFM and install it yourself. It says that it already has the binaries shipped with the package for most common use cases. I am not sure how it determines the binary version, but I have to build myself from time to time.&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;You &lt;strong&gt;&lt;em&gt;MUST&lt;/em&gt;&lt;/strong&gt; install the serialport package for this to work&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;h2&gt;Building Helper App with J5&lt;/h2&gt;
+
+&lt;p&gt;You can go to the example folder in the j5 package and have some fun with whatever you have on your hand like Arduino and LED. Or you can checkout the &lt;a href=&quot;https://www.youtube.com/results?search_query=nodebots&quot;&gt;videos&lt;/a&gt; as well.&lt;/p&gt;
+
+&lt;h3&gt;HTTP Server&lt;/h3&gt;
+
+&lt;p&gt;You can use the http module and make it listen on any port you have defined in your extension descriptor, by default the port id 12345.&lt;/p&gt;
+
+&lt;p&gt;You need to remember to call &lt;code&gt;response.end()&lt;/code&gt; promptly or Scratch will hold on to that HTTP request till it times out. The Scratch source code, at this time, is just a while loop firing HTTP requests on a single thread, so it blocks.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Remember to send data back to Scratch as quickly as possible.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;You can parse the HTTP requests sent from Scratch easily as they are in a very simple &lt;a href=&quot;https://github.com/LLK/scratchx/wiki&quot;&gt;slash-delimited format&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;J5 backend&lt;/h3&gt;
+
+&lt;h4&gt;Caching your data&lt;/h4&gt;
+
+&lt;p&gt;Usually j5 API returns very fast, you do not need to worry about the timings. But when you are dealing with loops it becomes somewhat more unpredictable, because writing to the serial device takes time, processing Firmata protocol on Arduino takes time and reflecting on the actual device also takes time. It becomes even slower when you are using a &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=1220&amp;amp;search=ble&amp;amp;description=true#.VeFMybR7wW8&quot;&gt;USB bluetooth link&lt;/a&gt; to wirelessly connect to your board.&lt;/p&gt;
+
+&lt;p&gt;I tried to write messages to a LCD. The loop keeps the LCD blinking and flashing and rewriting. Every time a message arrives I call &lt;code&gt;lcd.clear()&lt;/code&gt; then &lt;code&gt;lcd.print(msg)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;Keep the output values cached, only write when the value changes.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;h1&gt;Disclaimer&lt;/h1&gt;
+
+&lt;p&gt;With the movement of ScratchX( now Beta) This document might be obsolete soon.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 28 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/08/28/scratch_extension_with_johnny-five.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/28/scratch_extension_with_johnny-five.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
+        
+        
+      </item>
     
       <item>
         <title>Load Balancing with HAProxy</title>
@@ -26,13 +104,14 @@
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cfg&quot; data-lang=&quot;cfg&quot;&gt;&lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;mqtt&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1883&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1884&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcp&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;maxconn&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;200000&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcplog&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;redispatch&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;balance&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;leastconn&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv1&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.36:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv2&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.136:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv1&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.36:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;0.0.0.0:1024-65535&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
+  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv2&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.136:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;0.0.0.0:1024-65535&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
 
 &lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1936&lt;/span&gt;
   &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;enable&lt;/span&gt;
@@ -48,6 +127,12 @@
 &lt;h2&gt;&lt;code&gt;balance leastconn&lt;/code&gt;&lt;/h2&gt;
 
 &lt;p&gt;This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.&lt;/p&gt;
+
+&lt;h2&gt;&lt;code&gt;source 0.0.0.0:1024-65535&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;See this nice &lt;a href=&quot;http://comments.gmane.org/gmane.comp.web.haproxy/5594&quot;&gt;email exchange&lt;/a&gt;, also see haproxy&#39;s &lt;a href=&quot;https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4-source&quot;&gt;configuration manual&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Basically,&lt;/p&gt;
 
 &lt;h2&gt;Monitoring HAProxy&lt;/h2&gt;
 

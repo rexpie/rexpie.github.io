@@ -19,13 +19,14 @@ I changed the configuration to match our need for mqtt connections.
 {% highlight cfg %}
 listen mqtt
   bind *:1883
+  bind *:1884
   mode tcp
   maxconn 200000
   option tcplog
   option redispatch
   balance leastconn
-  server serv1 192.168.0.36:1883 check
-  server serv2 192.168.0.136:1883 check
+  server serv1 192.168.0.36:1883 source 0.0.0.0:1024-65535 check
+  server serv2 192.168.0.136:1883 source 0.0.0.0:1024-65535 check
 
 listen stats *:1936
   stats enable
@@ -39,6 +40,11 @@ This is used to tell HAProxy to retry to another backend server when one of the 
 
 ## `balance leastconn`
 This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.
+
+## `source 0.0.0.0:1024-65535`
+See this nice [email exchange](http://comments.gmane.org/gmane.comp.web.haproxy/5594), also see haproxy's [configuration manual](https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4-source).
+
+Basically, 
 
 ## Monitoring HAProxy
 
