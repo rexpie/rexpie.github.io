@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Stress testing Mosquitto MQTT Broker Update 1"
-date:   2015-08-23 10:55:00
+date:   2015-08-31
 tags: mqtt mosquitto
 ---
 
