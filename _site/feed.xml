@@ -6,9 +6,104 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 31 Aug 2015 21:24:16 +0800</pubDate>
-    <lastBuildDate>Mon, 31 Aug 2015 21:24:16 +0800</lastBuildDate>
+    <pubDate>Mon, 31 Aug 2015 21:29:49 +0800</pubDate>
+    <lastBuildDate>Mon, 31 Aug 2015 21:29:49 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Stress testing Mosquitto MQTT Broker Update 1</title>
+        <description>&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
+
+&lt;p&gt;Last time I left a bit in the &lt;code&gt;TODO&lt;/code&gt;, saying that I will test with multiple clients on a host. I did.&lt;/p&gt;
+
+&lt;h2&gt;Env setup&lt;/h2&gt;
+
+&lt;p&gt;To compare the testing, I will give you the hardware settings:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Host            &lt;/th&gt;
+&lt;th&gt;CPU Core#  &lt;/th&gt;
+&lt;th&gt; Mem&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;VMware Guest    &lt;/td&gt;
+&lt;td&gt;1          &lt;/td&gt;
+&lt;td&gt;4g&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Physical        &lt;/td&gt;
+&lt;td&gt;2          &lt;/td&gt;
+&lt;td&gt;8g&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+&lt;p&gt;The clients are all VMware Guest Ubuntu Desktop machines cloned from the server. They have the same file limits, etc, nothing special.&lt;/p&gt;
+
+&lt;p&gt;I use bridge, not NAT for the network connectivity for the VMWare Guests, so they are just like other machines setup on the local network, not wrapped up inside the VM.&lt;/p&gt;
+
+&lt;h2&gt;Results&lt;/h2&gt;
+
+&lt;p&gt;Quite interesting. The VM Guest, no matter how I tune the numbers, cannot establish more than 655XX TCP connections, regardless of the IP/port combinations.&lt;/p&gt;
+
+&lt;p&gt;I tried to use HAProxy with another guest machine, and I get ~32000 frontend connections, and ~16000 backend connections to each of my two backend Mosquitto servers. So that is about 655XX TCP connection in total.&lt;/p&gt;
+
+&lt;p&gt;I kind of scratch my head when I cannot pass that threshold. I checked the values everywhere and I am sure my configuration is able to host more TCP connections than 655XX. Besides, this number is way too suspicious. I tried half a dozen times and the cap is always 655XX. Then I suspected VMWare.&lt;/p&gt;
+
+&lt;p&gt;Okay I need proof.&lt;/p&gt;
+
+&lt;p&gt;I used the same step to install a vanilla Ubuntu with the same iso image, followed the same steps I wrote myself to setup the server on the physical machine and guess what, I got more connections as expected.&lt;/p&gt;
+
+&lt;h3&gt;Final stats&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Host            &lt;/th&gt;
+&lt;th&gt;CPU%   &lt;/th&gt;
+&lt;th&gt;RAM%   &lt;/th&gt;
+&lt;th&gt;Conn Speed     &lt;/th&gt;
+&lt;th&gt;Max Conn&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;VMware Guest    &lt;/td&gt;
+&lt;td&gt;90%+   &lt;/td&gt;
+&lt;td&gt;0.4%   &lt;/td&gt;
+&lt;td&gt;2000+/s -&gt; ~100/s&lt;/td&gt;
+&lt;td&gt; &lt;strong&gt;65,535&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Physical        &lt;/td&gt;
+&lt;td&gt;90%+   &lt;/td&gt;
+&lt;td&gt;0.4%   &lt;/td&gt;
+&lt;td&gt;3000+/s -&gt; ~100/s&lt;/td&gt;
+&lt;td&gt; &lt;strong&gt;100,000+&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+&lt;p&gt;The speed of establishing new connections wears down gradually. Mosquitto can build up 10K connections in a few seconds, but the speed slows down after that.&lt;/p&gt;
+
+&lt;p&gt;I got over 100K live TCP connections with a physical machine, using only 0.4% memory. That is very impressive indeed.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 31 Aug 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/08/31/stress_testing_mosquitto_update_1.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/31/stress_testing_mosquitto_update_1.html</guid>
+        
+        <category>mqtt</category>
+        
+        <category>mosquitto</category>
+        
+        
+      </item>
     
       <item>
         <title>Scratch with Johnny-five</title>
