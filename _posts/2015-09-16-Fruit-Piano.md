@@ -28,8 +28,7 @@ This is essentially witchcraft. You can refer to [this post](http://playground.a
 
 ### Arduino Code
 
-```
-
+{% highlight C %}
 void setup() {
   // setup Serial port baud rate
   Serial.begin(115200);
@@ -53,13 +52,15 @@ void loop() {
     delay(10);
   }
 }
-```
+{% endhighlight %}
+
 
 This code just loops over each pin and report their capacitance readings to the serial port.
 
 ### Helper App Code
 
-```
+{% highlight javascript%}
+
 var serialPort = require("serialport");
 var http = require("http");
 
@@ -118,7 +119,8 @@ server = http.createServer(function(request, response) {
 });
 server.listen(23456); // HTTP port to listen to
 
-```
+{% endhighlight %}
+
 
 This runs on nodejs. You must have the [serialport](https://www.npmjs.com/package/serialport) package installed.
 
@@ -129,14 +131,15 @@ You also need to define your own extension so Scratch can get data from your Hel
 
 Write up a text file and call it Fruits.s2e, with below content:
 
-```
+{% highlight js%}
 {	"extensionName": "DFRobot",
 	"extensionPort": 23456,
 	"blockSpecs": [
 		["r", "Fruit reading at pin %n","capacity", "13"]
 	]
 }
-```
+{% endhighlight %}
+
 
 the "r" means it is an input block. The "capacity" here is the reading variable identifier and must match the format we send from Nodejs server.
 

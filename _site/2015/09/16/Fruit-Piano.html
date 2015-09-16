@@ -96,94 +96,93 @@
 
 <h3>Arduino Code</h3>
 
-<pre><code>
-void setup() {
-  // setup Serial port baud rate
-  Serial.begin(115200);
-}
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// setup Serial port baud rate</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">115200</span><span class="p">);</span>
+<span class="p">}</span>
 
-void loop() {
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
 
-  // scan every digital pin
-  for (int i = 2; i &lt; 14; i++){
+  <span class="c1">// scan every digital pin</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+  
+    <span class="cm">/* Prints out:</span>
+<span class="cm">    * 2 2</span>
+<span class="cm">    * 3 2</span>
+<span class="cm">    * etc.*/</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">readCapacitivePin</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-    /* Prints out:
-    * 2 2
-    * 3 2
-    * etc.*/
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.print(readCapacitivePin(i));
-    Serial.print("\n");
+    <span class="c1">// no delay causes printing garbage</span>
+    <span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
 
-    // no delay causes printing garbage
-    delay(10);
-  }
-}
-</code></pre>
 
 <p>This code just loops over each pin and report their capacitance readings to the serial port.</p>
 
 <h3>Helper App Code</h3>
 
-<pre><code>var serialPort = require("serialport");
-var http = require("http");
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;serialport&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">);</span>
 
-var defaultPort;
-// holding the values of each port in a map, updated continuously
-var fruits = {};
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+<span class="c1">// holding the values of each port in a map, updated continuously</span>
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span>
 
-serialPort.list(function(err, ports) {
-    ports.forEach(function(port) {
-        // Arduino COM ports usually have the manufacturer name start with "Arduino"
-        if (port.manufacturer.toLowerCase().indexOf("arduino") &gt; -1) {
-            defaultPort = port.comName;
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;arduino&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
 
-            var sp = new serialPort.SerialPort(defaultPort, {
-                baudrate: 115200 // must match the baud rate in the Arduino sketch code
-            });
+            <span class="kd">var</span> <span class="nx">sp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">serialPort</span><span class="p">.</span><span class="nx">SerialPort</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="p">{</span>
+                <span class="nx">baudrate</span><span class="o">:</span> <span class="mi">115200</span> <span class="c1">// must match the baud rate in the Arduino sketch code</span>
+            <span class="p">});</span>
 
-            sp.on("open", function() {
-                sp.on('data', function(data) {
-                    var line = data.toString();
-                    var lines = line.split("\n"); // split line breaks
-                    var columns = line.split(" "); // split pin and reading
-                    if (columns.length &gt; 1) { // get rid of bad format
-                        var pin = columns[0];
-                        var reading = columns[1];
-                        reading = reading.replace(/(\r\n|\n|\r)/gm, "");
-                        fruits[pin] = reading;
-                    }
-                    console.dir(fruits);
-                });
-            });
-        }
+            <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">line</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+                    <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span> <span class="c1">// split line breaks</span>
+                    <span class="kd">var</span> <span class="nx">columns</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">);</span> <span class="c1">// split pin and reading</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">columns</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// get rid of bad format</span>
+                        <span class="kd">var</span> <span class="nx">pin</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                        <span class="kd">var</span> <span class="nx">reading</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                        <span class="nx">reading</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(\r\n|\n|\r)/gm</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">);</span>
+                        <span class="nx">fruits</span><span class="p">[</span><span class="nx">pin</span><span class="p">]</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">fruits</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
 
-    });
-});
+    <span class="p">});</span>
+<span class="p">});</span>
 
-// global http server
-var server;
-server = http.createServer(function(request, response) {
+<span class="c1">// global http server</span>
+<span class="kd">var</span> <span class="nx">server</span><span class="p">;</span>
+<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
 
-    // start recording request entry time
+    <span class="c1">// start recording request entry time</span>
 
-    if (request.url != '/poll') { // not poll
-        // print non-polling command sent by Scratch        
+    <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="s1">&#39;/poll&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// not poll</span>
+        <span class="c1">// print non-polling command sent by Scratch       </span>
 
-    } else { // Polling
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// Polling</span>
 
-        Object.keys(fruits).forEach(function(pinName) {
-            // prints "capacity/13 2\n", for instance
-            response.write("capacity/" + pinName + " " + fruits[pinName] + "\n");
-        });
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">fruits</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">pinName</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// prints &quot;capacity/13 2\n&quot;, for instance</span>
+            <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">&quot;capacity/&quot;</span> <span class="o">+</span> <span class="nx">pinName</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinName</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\n&quot;</span><span class="p">);</span>
+        <span class="p">});</span>
 
-    } // end if
+    <span class="p">}</span> <span class="c1">// end if</span>
 
-    response.end();
-});
-server.listen(23456); // HTTP port to listen to
-</code></pre>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span> <span class="c1">// HTTP port to listen to</span></code></pre></div>
+
 
 <p>This runs on nodejs. You must have the <a href="https://www.npmjs.com/package/serialport">serialport</a> package installed.</p>
 
@@ -193,13 +192,13 @@ server.listen(23456); // HTTP port to listen to
 
 <p>Write up a text file and call it Fruits.s2e, with below content:</p>
 
-<pre><code>{   "extensionName": "DFRobot",
-    "extensionPort": 23456,
-    "blockSpecs": [
-        ["r", "Fruit reading at pin %n","capacity", "13"]
-    ]
-}
-</code></pre>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>   <span class="s2">&quot;extensionName&quot;</span><span class="o">:</span> <span class="s2">&quot;DFRobot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;extensionPort&quot;</span><span class="o">:</span> <span class="mi">23456</span><span class="p">,</span>
+    <span class="s2">&quot;blockSpecs&quot;</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;Fruit reading at pin %n&quot;</span><span class="p">,</span><span class="s2">&quot;capacity&quot;</span><span class="p">,</span> <span class="s2">&quot;13&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">}</span></code></pre></div>
+
 
 <p>the "r" means it is an input block. The "capacity" here is the reading variable identifier and must match the format we send from Nodejs server.</p>
 
