@@ -6,9 +6,248 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 31 Aug 2015 21:29:49 +0800</pubDate>
-    <lastBuildDate>Mon, 31 Aug 2015 21:29:49 +0800</lastBuildDate>
+    <pubDate>Wed, 16 Sep 2015 22:16:03 +0800</pubDate>
+    <lastBuildDate>Wed, 16 Sep 2015 22:16:03 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Fruit Piano with Arduino/Scratch</title>
+        <description>&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
+
+&lt;p&gt;We have seen many interesting musical applications with Arduino &lt;a href=&quot;https://www.youtube.com/watch?v=jAVE6T7FqJs&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://www.youtube.com/watch?v=yRvC8lNsvZU&quot;&gt;there&lt;/a&gt;. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don&#39;t have those trained hands?&lt;/p&gt;
+
+&lt;p&gt;Scratch comes to the rescue.&lt;/p&gt;
+
+&lt;p&gt;Here we combine the quick prototype capabilities of Arduino and rich interactive libraries of Scratch to make the musics a bit more colourful.&lt;/p&gt;
+
+&lt;h1&gt;System Architecture&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit%20Piano%20Arch.svg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The system is quite similar to the one with Firmata in my another &lt;a href=&quot;http://rexpie.github.io/2015/08/23/extending-scratch.html&quot;&gt;article&lt;/a&gt;, except that it does not use Firmata. Extending firmata is of course a choice, however a quite expensive one.&lt;/p&gt;
+
+&lt;p&gt;In this system, Arduino reports the status of each pin to the Helper App, which bundles the results and send over to Scratch. Scratch listens for changes in the pin values and triggers a sound accordingly when the threshold is exceeded.&lt;/p&gt;
+
+&lt;h2&gt;Reading the input capacitance from digital pin&lt;/h2&gt;
+
+&lt;p&gt;This is essentially witchcraft. You can refer to &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don&#39;t want to waste food just for testing.&lt;/p&gt;
+
+&lt;h2&gt;Channel Between Scratch and Arduino&lt;/h2&gt;
+
+&lt;h3&gt;Arduino Code&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;
+void setup() {
+  // setup Serial port baud rate
+  Serial.begin(115200);
+}
+
+void loop() {
+
+  // scan every digital pin
+  for (int i = 2; i &amp;lt; 14; i++){
+
+    /* Prints out:
+    * 2 2
+    * 3 2
+    * etc.*/
+    Serial.print(i);
+    Serial.print(&quot; &quot;);
+    Serial.print(readCapacitivePin(i));
+    Serial.print(&quot;\n&quot;);
+
+    // no delay causes printing garbage
+    delay(10);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This code just loops over each pin and report their capacitance readings to the serial port.&lt;/p&gt;
+
+&lt;h3&gt;Helper App Code&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var serialPort = require(&quot;serialport&quot;);
+var http = require(&quot;http&quot;);
+
+var defaultPort;
+// holding the values of each port in a map, updated continuously
+var fruits = {};
+
+serialPort.list(function(err, ports) {
+    ports.forEach(function(port) {
+        // Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;
+        if (port.manufacturer.toLowerCase().indexOf(&quot;arduino&quot;) &amp;gt; -1) {
+            defaultPort = port.comName;
+
+            var sp = new serialPort.SerialPort(defaultPort, {
+                baudrate: 115200 // must match the baud rate in the Arduino sketch code
+            });
+
+            sp.on(&quot;open&quot;, function() {
+                sp.on(&#39;data&#39;, function(data) {
+                    var line = data.toString();
+                    var lines = line.split(&quot;\n&quot;); // split line breaks
+                    var columns = line.split(&quot; &quot;); // split pin and reading
+                    if (columns.length &amp;gt; 1) { // get rid of bad format
+                        var pin = columns[0];
+                        var reading = columns[1];
+                        reading = reading.replace(/(\r\n|\n|\r)/gm, &quot;&quot;);
+                        fruits[pin] = reading;
+                    }
+                    console.dir(fruits);
+                });
+            });
+        }
+
+    });
+});
+
+// global http server
+var server;
+server = http.createServer(function(request, response) {
+
+    // start recording request entry time
+
+    if (request.url != &#39;/poll&#39;) { // not poll
+        // print non-polling command sent by Scratch        
+
+    } else { // Polling
+
+        Object.keys(fruits).forEach(function(pinName) {
+            // prints &quot;capacity/13 2\n&quot;, for instance
+            response.write(&quot;capacity/&quot; + pinName + &quot; &quot; + fruits[pinName] + &quot;\n&quot;);
+        });
+
+    } // end if
+
+    response.end();
+});
+server.listen(23456); // HTTP port to listen to
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This runs on nodejs. You must have the &lt;a href=&quot;https://www.npmjs.com/package/serialport&quot;&gt;serialport&lt;/a&gt; package installed.&lt;/p&gt;
+
+&lt;h3&gt;Scratch Extension File&lt;/h3&gt;
+
+&lt;p&gt;You also need to define your own extension so Scratch can get data from your Helper App.&lt;/p&gt;
+
+&lt;p&gt;Write up a text file and call it Fruits.s2e, with below content:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{   &quot;extensionName&quot;: &quot;DFRobot&quot;,
+    &quot;extensionPort&quot;: 23456,
+    &quot;blockSpecs&quot;: [
+        [&quot;r&quot;, &quot;Fruit reading at pin %n&quot;,&quot;capacity&quot;, &quot;13&quot;]
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;the &quot;r&quot; means it is an input block. The &quot;capacity&quot; here is the reading variable identifier and must match the format we send from Nodejs server.&lt;/p&gt;
+
+&lt;h3&gt;Setting up the Scratch Project&lt;/h3&gt;
+
+&lt;p&gt;The Chinese is just the translation of &quot;Fruit reading at Pin&quot;. I would advise against printing this on your T-shirt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit%20Scratch.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see you can make Scratch to play any sound you like. This example just uses built-in piano tones. You can customise Scratch to play any sound of your choice.&lt;/p&gt;
+
+&lt;p&gt;The reason for so many separate blocks is to enable chord, that is touching two pieces of fruit at the same time and play two distinctive notes simultaneously.&lt;/p&gt;
+
+&lt;p&gt;Note that attaching fruit to the wires will increase the readings for the capacitance. If your fruit is large, remember to raise the threashold. Here I use 5 because wet paper tissues usually get a reading of 3.&lt;/p&gt;
+
+&lt;p&gt;Also don&#39;t let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.&lt;/p&gt;
+
+&lt;h1&gt;Demo&lt;/h1&gt;
+
+&lt;p&gt;I will get a video when the time comes. You can always use fingers or wet paper tissue balls or real fruits to test for yourself.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 16 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/09/16/Fruit-Piano.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/09/16/Fruit-Piano.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Scratch with Johnny-five</title>
+        <description>&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
+
+&lt;h2&gt;WHY?&lt;/h2&gt;
+
+&lt;p&gt;Well because Scratch is used by teachers and students. They are usually found in places called schools. Schools may not have funding to buy latest models of PC frequently so some of them are still running XP. That&#39;s why.&lt;/p&gt;
+
+&lt;h1&gt;What do you need?&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://scratch.mit.edu/scratchr2/static/sa/Scratch-439.1.exe&quot;&gt;Scratch version 439.1&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Scratch 2 Offline &lt;a href=&quot;https://scratch.mit.edu/scratch2download/&quot;&gt;documentation&lt;/a&gt; suggests if &lt;em&gt;Scratch 2 crashes&lt;/em&gt; on startup, you should reinstall. It does not say anything about &lt;em&gt;computer crash&lt;/em&gt;. FYI I did try reinstall and it did not help. The crash is consistent.&lt;/p&gt;
+
+&lt;h1&gt;What Else do you need?&lt;/h1&gt;
+
+&lt;p&gt;DO &lt;strong&gt;&lt;em&gt;NOT&lt;/em&gt;&lt;/strong&gt; update&lt;/p&gt;
+
+&lt;p&gt;DO &lt;strong&gt;&lt;em&gt;NOT&lt;/em&gt;&lt;/strong&gt; update&lt;/p&gt;
+
+&lt;p&gt;DO &lt;strong&gt;&lt;em&gt;NOT&lt;/em&gt;&lt;/strong&gt; update&lt;/p&gt;
+
+&lt;p&gt;Important things are worth repeating thrice.&lt;/p&gt;
+
+&lt;p&gt;But Adobe Air nudges you every now and then, and Scratch does this everytime on startup.&lt;/p&gt;
+
+&lt;p&gt;It is hard to imagine, in a school environment, nobody would be attempted to click on OK and see what happens.&lt;/p&gt;
+
+&lt;p&gt;We spent too much time on this to know, leave no such things in the hands of the users.&lt;/p&gt;
+
+&lt;h2&gt;Disable Adobe Air Auto Update&lt;/h2&gt;
+
+&lt;p&gt;They do have a way to disable automatic update. It requires either a file added to the user&#39;s application path, or registry editing. &lt;a href=&quot;https://forums.adobe.com/docs/DOC-1321&quot;&gt;See link&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Also, disable update &lt;strong&gt;&lt;em&gt;Immediately&lt;/em&gt;&lt;/strong&gt; after Air installation. Once it gets the taste of the later versions, it is not even possible to install Scratch without updating Air, which would again crash the computer.&lt;/p&gt;
+
+&lt;h2&gt;Disable Scratch 2 Auto Update&lt;/h2&gt;
+
+&lt;p&gt;Scratch checks for the update version from Scratch&#39;s CDN site. Easy way is to modify hosts file and lead the CDN to localhost. But that would make the official site really ugly because it also hosts all the js and css files of the site.&lt;/p&gt;
+
+&lt;p&gt;Second workaround is tricking Scratch to think it actually has a higher version.
+Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&lt;/code&gt; and change the &lt;code&gt;&amp;lt;VersionNumber&amp;gt;&lt;/code&gt; content to 999. This is as high as it can get. Don&#39;t try 9999 or 99999. RTFM.&lt;/p&gt;
+
+&lt;h2&gt;Two Stage Installation&lt;/h2&gt;
+
+&lt;p&gt;Actually, &quot;two stage&quot; is euphemism. More like &quot;intentionally fail on the first run then reinstall&quot;.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Install Scratch with default options. It will fire up Scratch after installation and on Windows XP, it will probably cause the blue screen of death.&lt;/li&gt;
+&lt;li&gt;Manually remove the &lt;code&gt;C:\Program Files\Scratch 2&lt;/code&gt; folder. Then install Scratch 2 again, but this time, uncheck the &lt;code&gt;Run application after installation&lt;/code&gt; checkbox.&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;p&gt;Then you should be able to get Scratch running. Under certain conditions.&lt;/p&gt;
+
+&lt;h2&gt;Conditions You Say?&lt;/h2&gt;
+
+&lt;p&gt;Yes. Scratch somehow still dies if you lauch it from the desktop shortcut. Instead, grab a Scratch 2 project file( with &lt;code&gt;.sb2&lt;/code&gt; file extension) and double click that file to open Scratch.&lt;/p&gt;
+
+&lt;h2&gt;Disclaimer&lt;/h2&gt;
+
+&lt;p&gt;Above procedures are tested on XP Professional Simplified Chinese version. Other versions like Home and Enterprise have not been tested. Neither have other language packs.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 11 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/09/11/installing-scratch-for-win-xp.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/09/11/installing-scratch-for-win-xp.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
+        
+        
+      </item>
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker Update 1</title>
