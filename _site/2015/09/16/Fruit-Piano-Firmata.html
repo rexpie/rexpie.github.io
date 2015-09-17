@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Fruit Piano with Firmata</title>
+  <meta name="description" content="In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://rexpie.github.io/2015/09/16/Fruit-Piano-Firmata.html">
+  <link rel="alternate" type="application/rss+xml" title="Rex's Blog" href="http://rexpie.github.io/feed.xml" />
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-66646350-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Rex's Blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">Rex Xia</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Fruit Piano with Firmata</h1>
+    <p class="post-meta">Sep 16, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p>In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.</p>
+
+<h1>Extending Firmata on Arduino</h1>
+
+<p>I was strolling on google when a wild <a href="http://blog.s4a.cat/2015/03/13/Extending-Firmata-for-Snap4Arduino.html">tutorial</a> appears. Thanks to this piece of example which encouraged me to give Firmata a try.</p>
+
+<p>I was previously looking at Johnny-five's code and was properly scared off. The complexity is just too damn high.</p>
+
+<p>However we are not toying with Johnny-five this time, just plain old Firmata.</p>
+
+<p>First we open up the StandardFirmata ino file and insert this code:</p>
+
+<div class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">case</span> <span class="mh">0x08</span><span class="o">:</span>
+      <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">START_SYSEX</span><span class="p">);</span>
+      <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="mh">0x08</span><span class="p">);</span>
+      <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+      <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">readCapacitivePin</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]));</span>
+      <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">END_SYSEX</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span></code></pre></div>
+
+
+<p>Also insert the readCapacitivePin function to the end of the file. You can find the code in <a href="http://playground.arduino.cc/Code/CapacitiveSensor">this post</a>.</p>
+
+<h1>Extending Firmata Nodejs client</h1>
+
+<p>You can get your firmata module from npm.</p>
+
+<p>Once you have installed the module, go to its directory and find <code>lib/firmata.js</code>.
+Add the following code:</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">PIN_CAPACITANCE</span> <span class="o">=</span> <span class="mh">0x08</span><span class="p">;</span>
+
+<span class="nx">SYSEX_RESPONSE</span><span class="p">[</span><span class="nx">PIN_CAPACITANCE</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">board</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">pin</span> <span class="o">=</span> <span class="nx">board</span><span class="p">.</span><span class="nx">currentBuffer</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">cap</span> <span class="o">=</span> <span class="nx">board</span><span class="p">.</span><span class="nx">currentBuffer</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+ <span class="c1">// console.log(board.currentBuffer.toString(&quot;hex&quot;));</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">board</span><span class="p">.</span><span class="nx">pins</span><span class="p">[</span><span class="nx">pin</span><span class="p">]){</span>
+    <span class="nx">board</span><span class="p">.</span><span class="nx">pins</span><span class="p">[</span><span class="nx">pin</span><span class="p">].</span><span class="nx">cap</span> <span class="o">=</span> <span class="nx">cap</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">Board</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">queryPinCapacitance</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pin</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">transport</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="k">new</span> <span class="nx">Buffer</span><span class="p">([</span><span class="nx">START_SYSEX</span><span class="p">,</span> <span class="nx">PIN_CAPACITANCE</span><span class="p">,</span> <span class="nx">pin</span><span class="p">,</span> <span class="nx">END_SYSEX</span><span class="p">]));</span>
+<span class="p">};</span></code></pre></div>
+
+
+<h1>Testing</h1>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;serialport&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">firmata</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./lib/firmata.js&#39;</span><span class="p">),</span>
+    <span class="nx">repl</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;repl&#39;</span><span class="p">);</span>
+
+
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;arduino&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">firmata</span><span class="p">.</span><span class="nx">Board</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Successfully Connected to &#39;</span> <span class="o">+</span> <span class="nx">defaultPort</span><span class="p">);</span>
+                <span class="nx">repl</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="s1">&#39;firmata&gt;&#39;</span><span class="p">).</span><span class="nx">context</span><span class="p">.</span><span class="nx">board</span> <span class="o">=</span> <span class="nx">board</span><span class="p">;</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">});</span></code></pre></div>
+
+
+<p>You can type in board.queryPinCapacitance(13) and try it out. Board setup is easy:</p>
+
+<p><img src="http://playground.arduino.cc/uploads/Code/capacitive.jpg" alt="image" /></p>
+
+<p>Image curtesy to Arduino</p>
+
+<h1>Firmataized Fruit Piano</h1>
+
+<p>Here is your Helper App code</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;serialport&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">firmata</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;firmata&quot;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+<span class="c1">// holding the values of each port in a map, updated continuously</span>
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span>
+
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;arduino&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">firmata</span><span class="p">.</span><span class="nx">Board</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Connected to:&quot;</span> <span class="o">+</span> <span class="nx">defaultPort</span><span class="p">);</span>
+                <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">pinNum</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span> <span class="nx">pinNum</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">;</span> <span class="nx">pinNum</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">board</span><span class="p">.</span><span class="nx">queryPinCapacitance</span><span class="p">(</span><span class="nx">pinNum</span><span class="p">);</span>
+                        <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinNum</span><span class="p">]</span> <span class="o">=</span> <span class="nx">board</span><span class="p">.</span><span class="nx">pins</span><span class="p">[</span><span class="nx">pinNum</span><span class="p">].</span><span class="nx">cap</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+    <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="c1">// global http server</span>
+<span class="kd">var</span> <span class="nx">server</span><span class="p">;</span>
+<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// start recording request entry time</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="s1">&#39;/poll&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// not poll</span>
+        <span class="c1">// print non-polling command sent by Scratch       </span>
+
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// Polling</span>
+
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">fruits</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">pinName</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">&quot;capacity/&quot;</span> <span class="o">+</span> <span class="nx">pinName</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinName</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\n&quot;</span><span class="p">);</span>
+        <span class="p">});</span>
+
+    <span class="p">}</span> <span class="c1">// end if</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span></code></pre></div>
+
+
+<h1>Ready to Go</h1>
+
+<p>You can just use the Scratch project in the previous Fruit Piano Scratch project. The Scratch project is athogonal to our Helper App implementation hence no change is needed.</p>
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Rex's Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Rex's Blog</li>
+          <li><a href="mailto:rexpie@gmail.com">rexpie@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/rexpie">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">rexpie</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Soft sides and blind spots of IOT, hardware, Arduino.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
