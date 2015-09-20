@@ -1,8 +1,14 @@
 ---
+comments: true
+comments: true
+comments: true
 layout: post
 title:  "Fruit Piano with Arduino/Scratch"
 tags: Visual Programming
 ---
+comments: true
+comments: true
+comments: true
 
 # Fruit Piano with Arduino/Scratch
 

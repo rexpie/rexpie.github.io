@@ -1,8 +1,14 @@
 ---
+comments: true
+comments: true
+comments: true
 layout: post
 title:  "Extending Scratch"
 tags: Visual Programming
 ---
+comments: true
+comments: true
+comments: true
 
 
 ## Why Scratch

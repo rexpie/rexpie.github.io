@@ -1,8 +1,14 @@
 ---
+comments: true
+comments: true
+comments: true
 layout: post
 title:  "Fruit Piano with Firmata"
 tags: Visual Programming
 ---
+comments: true
+comments: true
+comments: true
 
 
 In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.

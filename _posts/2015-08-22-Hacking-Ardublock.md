@@ -1,8 +1,10 @@
 ---
+comments: true
 layout: post
 title:  "Hacking Ardublock"
 tags: Visual Programming
 ---
+comments: true
 ## Adding an extension to Ardublock
 
 Extended From: [How to hack ardublock](http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/)

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Stress testing Mosquitto MQTT Broker Update 1</title>
-  <meta name="description" content="Stress Testing Mosquitto Update 1">
+  <meta name="description" content="comments: truecomments: truecomments: true">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://rexpie.github.io/2015/08/31/stress_testing_mosquitto_update_1.html">
@@ -72,7 +72,11 @@
   </header>
 
   <article class="post-content">
-    <h1>Stress Testing Mosquitto Update 1</h1>
+    <p>comments: true
+comments: true
+comments: true</p>
+
+<h1>Stress Testing Mosquitto Update 1</h1>
 
 <p>Last time I left a bit in the <code>TODO</code>, saying that I will test with multiple clients on a host. I did.</p>
 
@@ -80,28 +84,13 @@
 
 <p>To compare the testing, I will give you the hardware settings:</p>
 
-<table>
-<thead>
-<tr>
-<th>Host            </th>
-<th>CPU Core#  </th>
-<th> Mem</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>VMware Guest    </td>
-<td>1          </td>
-<td>4g</td>
-</tr>
-<tr>
-<td>Physical        </td>
-<td>2          </td>
-<td>8g</td>
-</tr>
-</tbody>
-</table>
-
+<p>Host            |CPU Core#  | Mem <br/>
+--------------- |---------- |-----
+comments: true
+comments: true
+comments: true
+VMware Guest    |1          |4g
+Physical        |2          |8g</p>
 
 <p>The clients are all VMware Guest Ubuntu Desktop machines cloned from the server. They have the same file limits, etc, nothing special.</p>
 
@@ -121,34 +110,13 @@
 
 <h3>Final stats</h3>
 
-<table>
-<thead>
-<tr>
-<th>Host            </th>
-<th>CPU%   </th>
-<th>RAM%   </th>
-<th>Conn Speed     </th>
-<th>Max Conn</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>VMware Guest    </td>
-<td>90%+   </td>
-<td>0.4%   </td>
-<td>2000+/s -> ~100/s</td>
-<td> <strong>65,535</strong></td>
-</tr>
-<tr>
-<td>Physical        </td>
-<td>90%+   </td>
-<td>0.4%   </td>
-<td>3000+/s -> ~100/s</td>
-<td> <strong>100,000+</strong></td>
-</tr>
-</tbody>
-</table>
-
+<p>Host            |CPU%   |RAM%   |Conn Speed     |Max Conn
+--------------- |------ |------ |---------------|--------
+comments: true
+comments: true
+comments: true
+VMware Guest    |90%+   |0.4%   |2000+/s -> ~100/s| <strong>65,535</strong>
+Physical        |90%+   |0.4%   |3000+/s -> ~100/s| <strong>100,000+</strong></p>
 
 <p>The speed of establishing new connections wears down gradually. Mosquitto can build up 10K connections in a few seconds, but the speed slows down after that.</p>
 
@@ -158,6 +126,36 @@
 
 </div>
 
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rexia';
+	var disqus_developer = 1;
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rexia';
+    var disqus_developer = 1;
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+  
+  
       </div>
     </div>
 

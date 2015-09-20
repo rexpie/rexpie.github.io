@@ -6,13 +6,17 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 17 Sep 2015 14:32:07 +0800</pubDate>
-    <lastBuildDate>Thu, 17 Sep 2015 14:32:07 +0800</lastBuildDate>
+    <pubDate>Sun, 20 Sep 2015 15:57:12 +0800</pubDate>
+    <lastBuildDate>Sun, 20 Sep 2015 15:57:12 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
         <title>Fruit Piano with Firmata</title>
-        <description>&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
 
 &lt;h1&gt;Extending Firmata on Arduino&lt;/h1&gt;
 
@@ -157,7 +161,11 @@ Add the following code:&lt;/p&gt;
     
       <item>
         <title>Fruit Piano with Arduino/Scratch</title>
-        <description>&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
 
 &lt;p&gt;We have seen many interesting musical applications with Arduino &lt;a href=&quot;https://www.youtube.com/watch?v=jAVE6T7FqJs&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://www.youtube.com/watch?v=yRvC8lNsvZU&quot;&gt;there&lt;/a&gt;. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don&#39;t have those trained hands?&lt;/p&gt;
 
@@ -318,7 +326,11 @@ Add the following code:&lt;/p&gt;
     
       <item>
         <title>Scratch with Johnny-five</title>
-        <description>&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
 
 &lt;h2&gt;WHY?&lt;/h2&gt;
 
@@ -395,7 +407,11 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker Update 1</title>
-        <description>&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
 
 &lt;p&gt;Last time I left a bit in the &lt;code&gt;TODO&lt;/code&gt;, saying that I will test with multiple clients on a host. I did.&lt;/p&gt;
 
@@ -403,28 +419,13 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
 
 &lt;p&gt;To compare the testing, I will give you the hardware settings:&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Host            &lt;/th&gt;
-&lt;th&gt;CPU Core#  &lt;/th&gt;
-&lt;th&gt; Mem&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;VMware Guest    &lt;/td&gt;
-&lt;td&gt;1          &lt;/td&gt;
-&lt;td&gt;4g&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Physical        &lt;/td&gt;
-&lt;td&gt;2          &lt;/td&gt;
-&lt;td&gt;8g&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
+&lt;p&gt;Host            |CPU Core#  | Mem &lt;br/&gt;
+--------------- |---------- |-----
+comments: true
+comments: true
+comments: true
+VMware Guest    |1          |4g
+Physical        |2          |8g&lt;/p&gt;
 
 &lt;p&gt;The clients are all VMware Guest Ubuntu Desktop machines cloned from the server. They have the same file limits, etc, nothing special.&lt;/p&gt;
 
@@ -444,34 +445,13 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
 
 &lt;h3&gt;Final stats&lt;/h3&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Host            &lt;/th&gt;
-&lt;th&gt;CPU%   &lt;/th&gt;
-&lt;th&gt;RAM%   &lt;/th&gt;
-&lt;th&gt;Conn Speed     &lt;/th&gt;
-&lt;th&gt;Max Conn&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;VMware Guest    &lt;/td&gt;
-&lt;td&gt;90%+   &lt;/td&gt;
-&lt;td&gt;0.4%   &lt;/td&gt;
-&lt;td&gt;2000+/s -&gt; ~100/s&lt;/td&gt;
-&lt;td&gt; &lt;strong&gt;65,535&lt;/strong&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Physical        &lt;/td&gt;
-&lt;td&gt;90%+   &lt;/td&gt;
-&lt;td&gt;0.4%   &lt;/td&gt;
-&lt;td&gt;3000+/s -&gt; ~100/s&lt;/td&gt;
-&lt;td&gt; &lt;strong&gt;100,000+&lt;/strong&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
+&lt;p&gt;Host            |CPU%   |RAM%   |Conn Speed     |Max Conn
+--------------- |------ |------ |---------------|--------
+comments: true
+comments: true
+comments: true
+VMware Guest    |90%+   |0.4%   |2000+/s -&gt; ~100/s| &lt;strong&gt;65,535&lt;/strong&gt;
+Physical        |90%+   |0.4%   |3000+/s -&gt; ~100/s| &lt;strong&gt;100,000+&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The speed of establishing new connections wears down gradually. Mosquitto can build up 10K connections in a few seconds, but the speed slows down after that.&lt;/p&gt;
 
@@ -490,7 +470,11 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
     
       <item>
         <title>Scratch with Johnny-five</title>
-        <description>&lt;h1&gt;Scratch Extension with Johnny-five&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Scratch Extension with Johnny-five&lt;/h1&gt;
 
 &lt;p&gt;Previous &lt;a href=&quot;http://rexpie.github.io/2015/08/23/extending-scratch.html&quot;&gt;article&lt;/a&gt; illustrated the architecture of the Scratch extension.&lt;/p&gt;
 
@@ -568,7 +552,11 @@ npm install serialport
     
       <item>
         <title>Load Balancing with HAProxy</title>
-        <description>&lt;h1&gt;Need to cluster&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Need to cluster&lt;/h1&gt;
 
 &lt;p&gt;IBM has a &lt;a href=&quot;http://www.redbooks.ibm.com/redbooks/pdfs/sg248054.pdf&quot;&gt;Redbook&lt;/a&gt; for its own IOT service environment. The book also described the topologies of enterprise MQTT service architectures. So, to cluster some mosquitto brokers, we need some other tools.&lt;/p&gt;
 
@@ -641,7 +629,11 @@ npm install serialport
     
       <item>
         <title>Mosquitto Troubleshooting</title>
-        <description>&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
 
 &lt;p&gt;When I tried to execute the &lt;code&gt;mosquitto_pub&lt;/code&gt; command, it complains about a lib missing:&lt;/p&gt;
 
@@ -690,7 +682,11 @@ open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker</title>
-        <description>&lt;h1&gt;What am I testing for&lt;/h1&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h1&gt;What am I testing for&lt;/h1&gt;
 
 &lt;p&gt;I am testing the server under a very &lt;strong&gt;specific&lt;/strong&gt; scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.&lt;/p&gt;
 
@@ -822,7 +818,11 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
     
       <item>
         <title>Extending Scratch</title>
-        <description>&lt;h2&gt;Why Scratch&lt;/h2&gt;
+        <description>&lt;p&gt;comments: true
+comments: true
+comments: true&lt;/p&gt;
+
+&lt;h2&gt;Why Scratch&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://scratch.mit.edu/&quot;&gt;Scratch2&lt;/a&gt; is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.&lt;/p&gt;
 
@@ -892,7 +892,9 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
     
       <item>
         <title>Hacking Ardublock</title>
-        <description>&lt;h2&gt;Adding an extension to Ardublock&lt;/h2&gt;
+        <description>&lt;p&gt;comments: true&lt;/p&gt;
+
+&lt;h2&gt;Adding an extension to Ardublock&lt;/h2&gt;
 
 &lt;p&gt;Extended From: &lt;a href=&quot;http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/&quot;&gt;How to hack ardublock&lt;/a&gt;&lt;/p&gt;
 
@@ -988,8 +990,8 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 You have to drill down to the &lt;code&gt;Translator&lt;/code&gt; core for advanced code generation, but it is not a very difficult task because the source code is quite well orgnized. Thumbs up to the &lt;a href=&quot;http://blog.ardublock.com&quot;&gt;Arublock&lt;/a&gt; team.&lt;/p&gt;
 </description>
         <pubDate>Sat, 22 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/22/Hacking%20Ardublock.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/22/Hacking%20Ardublock.html</guid>
+        <link>http://rexpie.github.io/2015/08/22/Hacking-Ardublock.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/22/Hacking-Ardublock.html</guid>
         
         <category>Visual</category>
         

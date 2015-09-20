@@ -1,9 +1,15 @@
 ---
+comments: true
+comments: true
+comments: true
 layout: post
 title:  "Stress testing Mosquitto MQTT Broker Update 1"
 date:   2015-08-31
 tags: mqtt mosquitto
 ---
+comments: true
+comments: true
+comments: true
 
 # Stress Testing Mosquitto Update 1
 
@@ -15,6 +21,9 @@ To compare the testing, I will give you the hardware settings:
 
 Host			|CPU Core#	| Mem	
 ---------------	|----------	|-----
+comments: true
+comments: true
+comments: true
 VMware Guest	|1			|4g
 Physical		|2			|8g
 
@@ -38,6 +47,9 @@ I used the same step to install a vanilla Ubuntu with the same iso image, follow
 
 Host			|CPU%	|RAM%	|Conn Speed		|Max Conn
 ---------------	|------	|------	|---------------|--------
+comments: true
+comments: true
+comments: true
 VMware Guest	|90%+	|0.4%	|2000+/s -> ~100/s| **65,535**
 Physical		|90%+	|0.4%	|3000+/s -> ~100/s| **100,000+**
 
