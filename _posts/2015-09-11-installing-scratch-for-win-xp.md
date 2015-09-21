@@ -1,14 +1,9 @@
 ---
 comments: true
-comments: true
-comments: true
 layout: post
 title:  "Scratch with Johnny-five"
 tags: Visual Programming
 ---
-comments: true
-comments: true
-comments: true
 
 # Installing Scratch for Windows XP
 

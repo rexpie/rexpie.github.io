@@ -1,14 +1,10 @@
 ---
 comments: true
-comments: true
-comments: true
 layout: post
 title:  "Load Balancing with HAProxy"
 tags: haproxy, load balancing, mosquitto
 ---
-comments: true
-comments: true
-comments: true
+
 
 # Need to cluster
 

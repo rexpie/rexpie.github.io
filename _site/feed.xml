@@ -6,17 +6,13 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 20 Sep 2015 15:57:12 +0800</pubDate>
-    <lastBuildDate>Sun, 20 Sep 2015 15:57:12 +0800</lastBuildDate>
+    <pubDate>Mon, 21 Sep 2015 16:32:14 +0800</pubDate>
+    <lastBuildDate>Mon, 21 Sep 2015 16:32:14 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
         <title>Fruit Piano with Firmata</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
+        <description>&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
 
 &lt;h1&gt;Extending Firmata on Arduino&lt;/h1&gt;
 
@@ -161,11 +157,7 @@ Add the following code:&lt;/p&gt;
     
       <item>
         <title>Fruit Piano with Arduino/Scratch</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
+        <description>&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
 
 &lt;p&gt;We have seen many interesting musical applications with Arduino &lt;a href=&quot;https://www.youtube.com/watch?v=jAVE6T7FqJs&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://www.youtube.com/watch?v=yRvC8lNsvZU&quot;&gt;there&lt;/a&gt;. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don&#39;t have those trained hands?&lt;/p&gt;
 
@@ -311,7 +303,7 @@ comments: true&lt;/p&gt;
 
 &lt;h1&gt;Demo&lt;/h1&gt;
 
-&lt;p&gt;I will get a video when the time comes. You can always use fingers or wet paper tissue balls or real fruits to test for yourself.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/fruit.jpg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 16 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/09/16/Fruit-Piano.html</link>
@@ -326,11 +318,7 @@ comments: true&lt;/p&gt;
     
       <item>
         <title>Scratch with Johnny-five</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
+        <description>&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
 
 &lt;h2&gt;WHY?&lt;/h2&gt;
 
@@ -407,11 +395,7 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker Update 1</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
+        <description>&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
 
 &lt;p&gt;Last time I left a bit in the &lt;code&gt;TODO&lt;/code&gt;, saying that I will test with multiple clients on a host. I did.&lt;/p&gt;
 
@@ -470,11 +454,7 @@ Physical        |90%+   |0.4%   |3000+/s -&gt; ~100/s| &lt;strong&gt;100,000+&lt
     
       <item>
         <title>Scratch with Johnny-five</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Scratch Extension with Johnny-five&lt;/h1&gt;
+        <description>&lt;h1&gt;Scratch Extension with Johnny-five&lt;/h1&gt;
 
 &lt;p&gt;Previous &lt;a href=&quot;http://rexpie.github.io/2015/08/23/extending-scratch.html&quot;&gt;article&lt;/a&gt; illustrated the architecture of the Scratch extension.&lt;/p&gt;
 
@@ -552,11 +532,7 @@ npm install serialport
     
       <item>
         <title>Load Balancing with HAProxy</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Need to cluster&lt;/h1&gt;
+        <description>&lt;h1&gt;Need to cluster&lt;/h1&gt;
 
 &lt;p&gt;IBM has a &lt;a href=&quot;http://www.redbooks.ibm.com/redbooks/pdfs/sg248054.pdf&quot;&gt;Redbook&lt;/a&gt; for its own IOT service environment. The book also described the topologies of enterprise MQTT service architectures. So, to cluster some mosquitto brokers, we need some other tools.&lt;/p&gt;
 
@@ -629,11 +605,7 @@ comments: true&lt;/p&gt;
     
       <item>
         <title>Mosquitto Troubleshooting</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
+        <description>&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
 
 &lt;p&gt;When I tried to execute the &lt;code&gt;mosquitto_pub&lt;/code&gt; command, it complains about a lib missing:&lt;/p&gt;
 
@@ -682,11 +654,7 @@ open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h1&gt;What am I testing for&lt;/h1&gt;
+        <description>&lt;h1&gt;What am I testing for&lt;/h1&gt;
 
 &lt;p&gt;I am testing the server under a very &lt;strong&gt;specific&lt;/strong&gt; scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.&lt;/p&gt;
 
@@ -818,11 +786,7 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
     
       <item>
         <title>Extending Scratch</title>
-        <description>&lt;p&gt;comments: true
-comments: true
-comments: true&lt;/p&gt;
-
-&lt;h2&gt;Why Scratch&lt;/h2&gt;
+        <description>&lt;h2&gt;Why Scratch&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://scratch.mit.edu/&quot;&gt;Scratch2&lt;/a&gt; is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.&lt;/p&gt;
 
@@ -892,9 +856,7 @@ comments: true&lt;/p&gt;
     
       <item>
         <title>Hacking Ardublock</title>
-        <description>&lt;p&gt;comments: true&lt;/p&gt;
-
-&lt;h2&gt;Adding an extension to Ardublock&lt;/h2&gt;
+        <description>&lt;h2&gt;Adding an extension to Ardublock&lt;/h2&gt;
 
 &lt;p&gt;Extended From: &lt;a href=&quot;http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/&quot;&gt;How to hack ardublock&lt;/a&gt;&lt;/p&gt;
 

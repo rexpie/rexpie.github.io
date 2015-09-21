@@ -1,14 +1,9 @@
 ---
 comments: true
-comments: true
-comments: true
 layout: post
 title:  "Fruit Piano with Arduino/Scratch"
 tags: Visual Programming
 ---
-comments: true
-comments: true
-comments: true
 
 # Fruit Piano with Arduino/Scratch
 
@@ -167,4 +162,4 @@ Also don't let the fruit touch each other. Once they touch each other, the readi
 
 # Demo
 
-I will get a video when the time comes. You can always use fingers or wet paper tissue balls or real fruits to test for yourself.
+![image]({{site.url}}/assets/fruit.jpg)

@@ -1,14 +1,10 @@
 ---
 comments: true
-comments: true
-comments: true
 layout: post
 title:  "Mosquitto Troubleshooting"
 tags: mqtt, mosquitto
 ---
-comments: true
-comments: true
-comments: true
+
 
 # Issues with mosquitto_pub
 

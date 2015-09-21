@@ -1,15 +1,10 @@
 ---
 comments: true
-comments: true
-comments: true
 layout: post
 title:  "Stress testing Mosquitto MQTT Broker"
 date:   2015-08-23 10:55:00
 tags: mqtt mosquitto
 ---
-comments: true
-comments: true
-comments: true
 
 # What am I testing for
 
