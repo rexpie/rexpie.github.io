@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Extending Scratch</title>
-  <meta name="description" content="Why Scratch">
+  <title>Hacking Blockly</title>
+  <meta name="description" content="Blockly Touch/Drag Events Tweaking">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://rexpie.github.io/2015/08/23/extending-scratch.html">
+  <link rel="canonical" href="http://rexpie.github.io/2015/11/22/hacking-blockly.html">
   <link rel="alternate" type="application/rss+xml" title="Rex's Blog" href="http://rexpie.github.io/feed.xml" />
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -67,66 +67,54 @@
         <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Extending Scratch</h1>
-    <p class="post-meta">Aug 23, 2015</p>
+    <h1 class="post-title">Hacking Blockly</h1>
+    <p class="post-meta">Nov 22, 2015</p>
   </header>
 
   <article class="post-content">
-    <h2>Why Scratch</h2>
+    <h1>Blockly Touch/Drag Events Tweaking</h1>
 
-<p><a href="https://scratch.mit.edu/">Scratch2</a> is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.</p>
+<h2>The issue</h2>
 
-<p>We focus on how to leverage Scratch to further enable hardware interaction for the young.</p>
+<blockquote><p>TL,DR: I want to enable scrolling with dragging on the flyout menu.</p></blockquote>
 
-<p>The challenge is extending Scratch and make it talk to the various boards and devices.</p>
+<p>I recently played with <a href="https://github.com/BlocklyDuino/BlocklyDuino">BlocklyDuino</a> a bit, and it was fun. I even embedded it into IOS app, using WKWebview and some JS bridging delegate.<br/>
+Only problem is when I added too many blocks into one toolbox category, I need to scroll down the flyout menu to find what I want. Now on touch devices, scrolling is fairly popular interaction and users have high expectations for that. But the blockly flyout is not doing what I expect. As soon as you touch one block, a new block is immediately created and the flyout menu closes. You can only scroll by dragging the scrollbar handle, or you touch empty spaces between or beside the blocks and drag the scroll panel. These spaces are very tight for smaller devices, making it hard to manipulate the menu.</p>
 
-<h2>But How?</h2>
+<h2>The culprit</h2>
 
-<p>Here is the architecture of the Scratch extension module. Note this is still under development by the Scratch team and is subject to change.</p>
+<p>After some code searching, the flyout.js file shows that the menu from toolbox has an <code>autoClose</code> attribute. So first,</p>
 
-<p><img src="http://rexpie.github.io/assets/Scratch2.png" title="Scratch Architecture" alt="Scratch arch" /></p>
+<pre><code class="javascript">Blockly.Flyout.prototype.autoClose = false;
+</code></pre>
 
-<p>You can also check the <a href="http://wiki.scratch.mit.edu/wiki/Scratch_Extension">official extension wiki</a> to get the latest updated info.</p>
+<p>Then, we go to the place where new blocks are created, and change its behaviour:</p>
 
-<h2>What else?</h2>
+<pre><code class="javascript">// only create a new block when dragging towards the right. Try to scroll up and down when dragging vertically.
+if (Math.sqrt(dx * dx + dy * dy) &gt; Blockly.DRAG_RADIUS &amp;&amp; dx &gt; 2 * Math.abs(dy)) {
+  // Create the block.
+  Blockly.Flyout.startFlyout_.createBlockFunc_(Blockly.Flyout.startBlock_)(Blockly.Flyout.startDownEvent_);
+} else {
+  // dragging menu vertically
+  var metrics = Blockly.Flyout.startFlyout_.getMetrics_();
+  var y = metrics.viewTop - dy;
+  y = Math.min(y, metrics.contentHeight - metrics.viewHeight);
+  y = Math.max(y, 0);
+  Blockly.Flyout.startDownEvent_ = e;
+  Blockly.Flyout.startFlyout_.scrollbar_.set(y);
+}
+</code></pre>
 
-<p>As you can see in the architecture diagram, you will need a <strong>helper app</strong> to enable the communication as Scratch does not speak on channels other than the <code>HTTP</code> protocol.</p>
+<p>Also, we need to change the code where the flyout closes itself, this code is near the end of function <code>createBlockFunc_</code>. The tricky part is that the flyout menu for the context menu is also using this bit of code.</p>
 
-<p>What you need is a third party, preferrably open sourced project to do that. Your helper app should act as an <code>HTTP proxy</code> and talk to Scratch <strong>AND</strong> it should also be able to talk to the board via serial ports.</p>
+<pre><code class="javascript">// Check if the flyout menu is popped out by toolbox or not. Do not hide the menu if context menu is calling this flyout.
+if (workspace.toolbox_ &amp;&amp; workspace.toolbox_.tree_) {
+  flyout.hide();
+  workspace.toolbox_.clearSelection();
+}
+</code></pre>
 
-<h2>Who's doing this</h2>
-
-<p>Let's take a look at some open source initiatives</p>
-
-<ul>
-<li><a href="http://johnny-five.io">johnny-five</a></li>
-<li><a href="https://github.com/MrYsLab/s2a_fm">s2a_fm</a></li>
-</ul>
-
-
-<p> Both projct is based on the <a href="http://firmata.org/">Firmata</a> protocol.</p>
-
-<h3>johnny-five</h3>
-
-<p>This popular project is node-js based. Highly configurable, actively maintained and very popular. You can leverage the server module of the nodejs project and easily put together a helper app with very little code.</p>
-
-<p>Some sample code:</p>
-
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">five</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"johnny-five"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">five</span><span class="p">.</span><span class="nx">Board</span><span class="p">();</span></p>
-
-<p><span class="nx">board</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"ready"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">led</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">five</span><span class="p">.</span><span class="nx">Led</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>
-  <span class="nx">led</span><span class="p">.</span><span class="nx">blink</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
-<span class="p">});</span></code></pre></figure></p>
-
-<h3>s2a_fm</h3>
-
-<p>This project bases on PyMata, a firmata Python client. It already integrated the server request handling and Firmata communication. You can extend the existing modules within the framework relatively easily.</p>
-
-<p>Here is a <a href="https://www.youtube.com/watch?v=tUv_Uu_SqZk">video</a> for s2a_fm based project</p>
-
-<p>You can choose whichever project you are comfortable with.</p>
+<p>And we are all set. The menu is scrollable via dragging vertically on the blocks as well. When you drag a block to the right, a new block is created and the flyout menu also closes itself.</p>
 
   </article>
 

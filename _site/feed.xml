@@ -6,151 +6,65 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 21 Sep 2015 16:32:14 +0800</pubDate>
-    <lastBuildDate>Mon, 21 Sep 2015 16:32:14 +0800</lastBuildDate>
-    <generator>Jekyll v2.5.3</generator>
+    <pubDate>Sun, 22 Nov 2015 15:09:11 +0800</pubDate>
+    <lastBuildDate>Sun, 22 Nov 2015 15:09:11 +0800</lastBuildDate>
+    <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title>Fruit Piano with Firmata</title>
-        <description>&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
+        <title>Hacking Blockly</title>
+        <description>&lt;h1&gt;Blockly Touch/Drag Events Tweaking&lt;/h1&gt;
 
-&lt;h1&gt;Extending Firmata on Arduino&lt;/h1&gt;
+&lt;h2&gt;The issue&lt;/h2&gt;
 
-&lt;p&gt;I was strolling on google when a wild &lt;a href=&quot;http://blog.s4a.cat/2015/03/13/Extending-Firmata-for-Snap4Arduino.html&quot;&gt;tutorial&lt;/a&gt; appears. Thanks to this piece of example which encouraged me to give Firmata a try.&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;TL,DR: I want to enable scrolling with dragging on the flyout menu.&lt;/p&gt;&lt;/blockquote&gt;
 
-&lt;p&gt;I was previously looking at Johnny-five&#39;s code and was properly scared off. The complexity is just too damn high.&lt;/p&gt;
+&lt;p&gt;I recently played with &lt;a href=&quot;https://github.com/BlocklyDuino/BlocklyDuino&quot;&gt;BlocklyDuino&lt;/a&gt; a bit, and it was fun. I even embedded it into IOS app, using WKWebview and some JS bridging delegate.&lt;br/&gt;
+Only problem is when I added too many blocks into one toolbox category, I need to scroll down the flyout menu to find what I want. Now on touch devices, scrolling is fairly popular interaction and users have high expectations for that. But the blockly flyout is not doing what I expect. As soon as you touch one block, a new block is immediately created and the flyout menu closes. You can only scroll by dragging the scrollbar handle, or you touch empty spaces between or beside the blocks and drag the scroll panel. These spaces are very tight for smaller devices, making it hard to manipulate the menu.&lt;/p&gt;
 
-&lt;p&gt;However we are not toying with Johnny-five this time, just plain old Firmata.&lt;/p&gt;
+&lt;h2&gt;The culprit&lt;/h2&gt;
 
-&lt;p&gt;First we open up the StandardFirmata ino file and insert this code:&lt;/p&gt;
+&lt;p&gt;After some code searching, the flyout.js file shows that the menu from toolbox has an &lt;code&gt;autoClose&lt;/code&gt; attribute. So first,&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readCapacitivePin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;Blockly.Flyout.prototype.autoClose = false;
+&lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;Then, we go to the place where new blocks are created, and change its behaviour:&lt;/p&gt;
 
-&lt;p&gt;Also insert the readCapacitivePin function to the end of the file. You can find the code in &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;// only create a new block when dragging towards the right. Try to scroll up and down when dragging vertically.
+if (Math.sqrt(dx * dx + dy * dy) &amp;gt; Blockly.DRAG_RADIUS &amp;amp;&amp;amp; dx &amp;gt; 2 * Math.abs(dy)) {
+  // Create the block.
+  Blockly.Flyout.startFlyout_.createBlockFunc_(Blockly.Flyout.startBlock_)(Blockly.Flyout.startDownEvent_);
+} else {
+  // dragging menu vertically
+  var metrics = Blockly.Flyout.startFlyout_.getMetrics_();
+  var y = metrics.viewTop - dy;
+  y = Math.min(y, metrics.contentHeight - metrics.viewHeight);
+  y = Math.max(y, 0);
+  Blockly.Flyout.startDownEvent_ = e;
+  Blockly.Flyout.startFlyout_.scrollbar_.set(y);
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;h1&gt;Extending Firmata Nodejs client&lt;/h1&gt;
+&lt;p&gt;Also, we need to change the code where the flyout closes itself, this code is near the end of function &lt;code&gt;createBlockFunc_&lt;/code&gt;. The tricky part is that the flyout menu for the context menu is also using this bit of code.&lt;/p&gt;
 
-&lt;p&gt;You can get your firmata module from npm.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;// Check if the flyout menu is popped out by toolbox or not. Do not hide the menu if context menu is calling this flyout.
+if (workspace.toolbox_ &amp;amp;&amp;amp; workspace.toolbox_.tree_) {
+  flyout.hide();
+  workspace.toolbox_.clearSelection();
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Once you have installed the module, go to its directory and find &lt;code&gt;lib/firmata.js&lt;/code&gt;.
-Add the following code:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;nx&quot;&gt;SYSEX_RESPONSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
- &lt;span class=&quot;c1&quot;&gt;// console.log(board.currentBuffer.toString(&amp;quot;hex&amp;quot;));&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]){&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prototype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;transport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Buffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h1&gt;Testing&lt;/h1&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;serialport&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;./lib/firmata.js&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;repl&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-
-&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &amp;quot;Arduino&amp;quot;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;arduino&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Successfully Connected to &amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;firmata&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;You can type in board.queryPinCapacitance(13) and try it out. Board setup is easy:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://playground.arduino.cc/uploads/Code/capacitive.jpg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Image curtesy to Arduino&lt;/p&gt;
-
-&lt;h1&gt;Firmataized Fruit Piano&lt;/h1&gt;
-
-&lt;p&gt;Here is your Helper App code&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;serialport&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;firmata&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;http&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// holding the values of each port in a map, updated continuously&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
-
-&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &amp;quot;Arduino&amp;quot;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;arduino&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;Connected to:&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;setInterval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                        &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                        &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-                &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;// start recording request entry time&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;/poll&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// not poll&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// print non-polling command sent by Scratch       &lt;/span&gt;
-
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Polling&lt;/span&gt;
-
-        &lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;capacity/&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot; &amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// end if&lt;/span&gt;
-
-    &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h1&gt;Ready to Go&lt;/h1&gt;
-
-&lt;p&gt;You can just use the Scratch project in the previous Fruit Piano Scratch project. The Scratch project is athogonal to our Helper App implementation hence no change is needed.&lt;/p&gt;
+&lt;p&gt;And we are all set. The menu is scrollable via dragging vertically on the blocks as well. When you drag a block to the right, a new block is created and the flyout menu also closes itself.&lt;/p&gt;
 </description>
-        <pubDate>Wed, 16 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/09/16/Fruit-Piano-Firmata.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/09/16/Fruit-Piano-Firmata.html</guid>
+        <pubDate>Sun, 22 Nov 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/11/22/hacking-blockly.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/11/22/hacking-blockly.html</guid>
         
         <category>Visual</category>
         
-        <category>Programming</category>
+        <category>Programming,</category>
+        
+        <category>Blockly</category>
         
         
       </item>
@@ -181,93 +95,97 @@ Add the following code:&lt;/p&gt;
 
 &lt;h3&gt;Arduino Code&lt;/h3&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;// setup Serial port baud rate&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;115200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// setup Serial port baud rate
+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;115200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
 
-&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;p&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
 
-  &lt;span class=&quot;c1&quot;&gt;// scan every digital pin&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-  
-    &lt;span class=&quot;cm&quot;&gt;/* Prints out:&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    * 2 2&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    * 3 2&lt;/span&gt;
-&lt;span class=&quot;cm&quot;&gt;    * etc.*/&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readCapacitivePin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;p&gt;  &lt;span class=&quot;c1&quot;&gt;// scan every digital pin
+&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;/p&gt;
 
-    &lt;span class=&quot;c1&quot;&gt;// no delay causes printing garbage&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;cm&quot;&amp;gt;/* Prints out:
+* 2 2
+* 3 2
+* etc.*/&amp;lt;/span&amp;gt;
+&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;i&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;readCapacitivePin&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;i&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;));&amp;lt;/span&amp;gt;
+&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+
+&amp;lt;span class=&quot;c1&quot;&amp;gt;// no delay causes printing garbage
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;This code just loops over each pin and report their capacitance readings to the serial port.&lt;/p&gt;
 
 &lt;h3&gt;Helper App Code&lt;/h3&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;serialport&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;http&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
 
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// holding the values of each port in a map, updated continuously&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;&lt;/p&gt;
 
-&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &amp;quot;Arduino&amp;quot;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;arduino&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
 
-            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;SerialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;baudrate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;115200&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// must match the baud rate in the Arduino sketch code&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;pre&gt;&lt;code&gt;        &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;new&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;serialPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;SerialPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;defaultPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+            &amp;lt;span class=&quot;na&quot;&amp;gt;baudrate&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;115200&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// must match the baud rate in the Arduino sketch code&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
 
-            &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;open&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;data&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lines&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// split line breaks&lt;/span&gt;
-                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// split pin and reading&lt;/span&gt;
-                    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// get rid of bad format&lt;/span&gt;
-                        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-                        &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/(\r\n|\n|\r)/gm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                        &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-                    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-                    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;on&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;open&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+            &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;on&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;data&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;toString&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;lines&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;split&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// split line breaks&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;split&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// split pin and reading&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;length&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// get rid of bad format&amp;lt;/span&amp;gt;
+                    &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pin&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;0&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;];&amp;lt;/span&amp;gt;
+                    &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;];&amp;lt;/span&amp;gt;
+                    &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;replace&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;(\r\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;|&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;|&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\r)&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/gm&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+                    &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pin&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+                &amp;lt;span class=&quot;nx&quot;&amp;gt;console&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;dir&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+            &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+    &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
 
-    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
+&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
 
-    &lt;span class=&quot;c1&quot;&gt;// start recording request entry time&lt;/span&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// start recording request entry time&amp;lt;/span&amp;gt;
 
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;/poll&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// not poll&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;// print non-polling command sent by Scratch       &lt;/span&gt;
+&amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;request&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;url&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;!=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;/poll&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// not poll&amp;lt;/span&amp;gt;
+    &amp;lt;span class=&quot;c1&quot;&amp;gt;// print non-polling command sent by Scratch       &amp;lt;/span&amp;gt;
 
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Polling&lt;/span&gt;
+&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;else&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// Polling&amp;lt;/span&amp;gt;
 
-        &lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;c1&quot;&gt;// prints &amp;quot;capacity/13 2\n&amp;quot;, for instance&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;capacity/&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot; &amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &amp;lt;span class=&quot;nb&quot;&amp;gt;Object&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;keys&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;).&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;forEach&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;c1&quot;&amp;gt;// prints &quot;capacity/13 2\n&quot;, for instance&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;write&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;capacity/&quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+    &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
 
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// end if&lt;/span&gt;
+&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// end if&amp;lt;/span&amp;gt;
 
-    &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// HTTP port to listen to&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;end&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// HTTP port to listen to&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;This runs on nodejs. You must have the &lt;a href=&quot;https://www.npmjs.com/package/serialport&quot;&gt;serialport&lt;/a&gt; package installed.&lt;/p&gt;
 
@@ -277,13 +195,12 @@ Add the following code:&lt;/p&gt;
 
 &lt;p&gt;Write up a text file and call it Fruits.s2e, with below content:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;   &lt;span class=&quot;s2&quot;&gt;&amp;quot;extensionName&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;DFRobot&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&amp;quot;extensionPort&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&amp;quot;blockSpecs&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;r&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Fruit reading at pin %n&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;capacity&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;13&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;    &lt;span class=&quot;s2&quot;&gt;&quot;extensionName&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DFRobot&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;extensionPort&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;blockSpecs&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;r&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Fruit reading at pin %n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;capacity&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;13&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;p&gt;the &quot;r&quot; means it is an input block. The &quot;capacity&quot; here is the reading variable identifier and must match the format we send from Nodejs server.&lt;/p&gt;
 
@@ -306,8 +223,152 @@ Add the following code:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/fruit.jpg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 16 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/09/16/Fruit-Piano.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/09/16/Fruit-Piano.html</guid>
+        <link>http://rexpie.github.io/2015/09/16/fruit-piano.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/09/16/fruit-piano.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Fruit Piano with Firmata</title>
+        <description>&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
+
+&lt;h1&gt;Extending Firmata on Arduino&lt;/h1&gt;
+
+&lt;p&gt;I was strolling on google when a wild &lt;a href=&quot;http://blog.s4a.cat/2015/03/13/Extending-Firmata-for-Snap4Arduino.html&quot;&gt;tutorial&lt;/a&gt; appears. Thanks to this piece of example which encouraged me to give Firmata a try.&lt;/p&gt;
+
+&lt;p&gt;I was previously looking at Johnny-five&#39;s code and was properly scared off. The complexity is just too damn high.&lt;/p&gt;
+
+&lt;p&gt;However we are not toying with Johnny-five this time, just plain old Firmata.&lt;/p&gt;
+
+&lt;p&gt;First we open up the StandardFirmata ino file and insert this code:&lt;/p&gt;
+
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readCapacitivePin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;Also insert the readCapacitivePin function to the end of the file. You can find the code in &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1&gt;Extending Firmata Nodejs client&lt;/h1&gt;
+
+&lt;p&gt;You can get your firmata module from npm.&lt;/p&gt;
+
+&lt;p&gt;Once you have installed the module, go to its directory and find &lt;code&gt;lib/firmata.js&lt;/code&gt;.
+Add the following code:&lt;/p&gt;
+
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;SYSEX_RESPONSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+ &lt;span class=&quot;c1&quot;&gt;// console.log(board.currentBuffer.toString(&quot;hex&quot;));&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]){&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prototype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;transport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Buffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;h1&gt;Testing&lt;/h1&gt;
+
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;./lib/firmata.js&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;repl&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Successfully Connected to &#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;firmata&amp;gt;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;You can type in board.queryPinCapacitance(13) and try it out. Board setup is easy:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://playground.arduino.cc/uploads/Code/capacitive.jpg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Image curtesy to Arduino&lt;/p&gt;
+
+&lt;h1&gt;Firmataized Fruit Piano&lt;/h1&gt;
+
+&lt;p&gt;Here is your Helper App code&lt;/p&gt;
+
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;firmata&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// holding the values of each port in a map, updated continuously&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Connected to:&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;setInterval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                        &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                        &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// start recording request entry time&amp;lt;/span&amp;gt;
+
+&amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;request&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;url&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;!=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;/poll&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// not poll&amp;lt;/span&amp;gt;
+    &amp;lt;span class=&quot;c1&quot;&amp;gt;// print non-polling command sent by Scratch       &amp;lt;/span&amp;gt;
+
+&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;else&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// Polling&amp;lt;/span&amp;gt;
+
+    &amp;lt;span class=&quot;nb&quot;&amp;gt;Object&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;keys&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;).&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;forEach&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;write&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;capacity/&quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
+    &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+
+&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// end if&amp;lt;/span&amp;gt;
+
+&amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;end&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;h1&gt;Ready to Go&lt;/h1&gt;
+
+&lt;p&gt;You can just use the Scratch project in the previous Fruit Piano Scratch project. The Scratch project is athogonal to our Helper App implementation hence no change is needed.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 16 Sep 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/09/16/fruit-piano-firmata.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/09/16/fruit-piano-firmata.html</guid>
         
         <category>Visual</category>
         
@@ -442,8 +503,8 @@ Physical        |90%+   |0.4%   |3000+/s -&gt; ~100/s| &lt;strong&gt;100,000+&lt
 &lt;p&gt;I got over 100K live TCP connections with a physical machine, using only 0.4% memory. That is very impressive indeed.&lt;/p&gt;
 </description>
         <pubDate>Mon, 31 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/31/stress_testing_mosquitto_update_1.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/31/stress_testing_mosquitto_update_1.html</guid>
+        <link>http://rexpie.github.io/2015/08/31/stress-testing-mosquitto-update-1.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/31/stress-testing-mosquitto-update-1.html</guid>
         
         <category>mqtt</category>
         
@@ -520,8 +581,8 @@ npm install serialport
 &lt;p&gt;With the movement of ScratchX( now Beta) This document might be obsolete soon.&lt;/p&gt;
 </description>
         <pubDate>Fri, 28 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/28/scratch_extension_with_johnny-five.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/28/scratch_extension_with_johnny-five.html</guid>
+        <link>http://rexpie.github.io/2015/08/28/scratch-extension-with-johnny-five.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/08/28/scratch-extension-with-johnny-five.html</guid>
         
         <category>Visual</category>
         
@@ -544,21 +605,20 @@ npm install serialport
 
 &lt;p&gt;I changed the configuration to match our need for mqtt connections.&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cfg&quot; data-lang=&quot;cfg&quot;&gt;&lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;mqtt&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1883&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1884&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcp&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;maxconn&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;200000&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;tcplog&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;redispatch&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;balance&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;leastconn&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv1&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.36:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;0.0.0.0:1024-65535&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;serv2&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;192.168.0.136:1883&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;0.0.0.0:1024-65535&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;check&lt;/span&gt;
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cfg&quot; data-lang=&quot;cfg&quot;&gt;listen mqtt
+  bind &lt;em&gt;:1883
+  bind &lt;/em&gt;:1884
+  mode tcp
+  maxconn 200000
+  option tcplog
+  option redispatch
+  balance leastconn
+  server serv1 192.168.0.36:1883 source 0.0.0.0:1024-65535 check
+  server serv2 192.168.0.136:1883 source 0.0.0.0:1024-65535 check&lt;/p&gt;
 
-&lt;span class=&quot;err&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*:1936&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;enable&lt;/span&gt;
-  &lt;span class=&quot;err&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;p&gt;listen stats *:1936
+  stats enable
+  stats uri /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;h2&gt;Configurations explained&lt;/h2&gt;
 
@@ -826,14 +886,13 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
 
 &lt;p&gt;Some sample code:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;johnny-five&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;johnny-five&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;&lt;/p&gt;
 
-&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;ready&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ready&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
   &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;blink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
 
 &lt;h3&gt;s2a_fm&lt;/h3&gt;
 
@@ -846,114 +905,6 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
         <pubDate>Sun, 23 Aug 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/08/23/extending-scratch.html</link>
         <guid isPermaLink="true">http://rexpie.github.io/2015/08/23/extending-scratch.html</guid>
-        
-        <category>Visual</category>
-        
-        <category>Programming</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Hacking Ardublock</title>
-        <description>&lt;h2&gt;Adding an extension to Ardublock&lt;/h2&gt;
-
-&lt;p&gt;Extended From: &lt;a href=&quot;http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/&quot;&gt;How to hack ardublock&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3&gt;Handling the dependencies&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Fork and clone Arduino form github&lt;/li&gt;
-&lt;li&gt;Import openblocks and Ardublock into eclipse&lt;/li&gt;
-&lt;li&gt;Import arduino-builder,arduino-dore and processing from Arduino project into eclipse&lt;/li&gt;
-&lt;li&gt;Modify the buildpath of Ardublock and add the above 3 projects as dependency. Add openblocks and an dependency as well.&lt;/li&gt;
-&lt;li&gt;Modify pom.xml in Ardublock，delete openblocks and Arduino dependency entries(They became obsolete over time and was no longer maintained)&lt;/li&gt;
-&lt;li&gt;Continue to delete the install-arduino-pde execution entry in pom.xml&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;p&gt;You should now see no compiling errors within the projects. You may have a few warnings about the java compiler version. Just change the compilation configs to make eclipse happy.&lt;/p&gt;
-
-&lt;p&gt;**If you are using other IDEs like IntelliJ, please use your own judgement to appropriately adapt the steps.&lt;/p&gt;
-
-&lt;h3&gt;Adding an LED module&lt;/h3&gt;
-
-&lt;p&gt;You can use the Ardublock article to do the same, here are some basic ideas:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Add one BlockGenus with your own parameters&lt;/li&gt;
-&lt;li&gt;Register the BlockGenus into one BlockDrawer so that you&#39;ll see the newly added module in the GUI, inside the designated drawer menu.&lt;/li&gt;
-&lt;li&gt;If you need new image, tag or other custom resources to go with the new module, you need to add them to the resources folder, with i18n entries. Modify the &lt;code&gt;ardublock&amp;lt;_{country_code}&amp;gt;.properties&lt;/code&gt; i18n file to achieve that.&lt;/li&gt;
-&lt;li&gt;Modify block-mapping.properties and point the module to use the corresponding &lt;code&gt;Translator&lt;/code&gt; Java class. You need to extend the &lt;code&gt;Translator&lt;/code&gt; class if you want to dive in deeper.&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;h3&gt;Export and install&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Right click Ardublock and Openblocks projects and export a jar package&lt;/li&gt;
-&lt;li&gt;You need to check the &lt;code&gt;export with all resources&lt;/code&gt; checkbox to include the image and configuration files.&lt;/li&gt;
-&lt;li&gt;Put your jar into the Arduino tools folder. Be careful with the folder names as one of them is said to be case sensitive. See the &lt;a href=&quot;http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/&quot;&gt;official tutorial&lt;/a&gt; for sure.&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;h3&gt;Test&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Open the Arduino installation folder&lt;/li&gt;
-&lt;li&gt;Run Arduino-debug and you can see the logs in the console window.&lt;/li&gt;
-&lt;li&gt;Click on &lt;code&gt;Tools&lt;/code&gt;-&gt;&lt;code&gt;Ardublock&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Drag your new module and test the functions.&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;h2&gt;Adding an I2C module&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;You need to know how to add your custom header file and c++ file&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;If you want to use I2C modules like an I2C mounted 1602 LCD, you need to add the I2C c++ libraries for easier coding. The original Ardublock can only generate a single ino file. Here is how:&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;First you create your new module, of course. See steps above. Let&#39;s call the new module I2C.&lt;/li&gt;
-&lt;li&gt;Modify the &lt;code&gt;Translator&lt;/code&gt; base class and add a &lt;code&gt;customHeaderFileSet&lt;/code&gt; private member, maybe next to its own &lt;code&gt;headerFileSet&lt;/code&gt; member.&lt;/li&gt;
-&lt;li&gt;Add a &lt;code&gt;addCustomHeaderFile&lt;/code&gt; API for clients and derived classes to manipulate the &lt;code&gt;customHeaderFileSet&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Modify your I2C module and call your API to add the custom header and/or c++ file.&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;translator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addCustomHeaderFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;LiquidCrystal_I2C.h&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ol&gt;
-&lt;li&gt;Import your header files and cpp file to eclipse. You should keep them well in your classpath.&lt;/li&gt;
-&lt;li&gt;Next you need to use file manipulation to read from your jar file, and write the file stream into the Aruino temp project location. You don&#39;t want to write to the destination, since they would clobber the source file to import.&lt;/li&gt;
-&lt;li&gt;Find the Aruino &lt;code&gt;Editor&lt;/code&gt; instance along the &lt;code&gt;Context&lt;/code&gt; instance and open your temp header and/or c++ file.&lt;/li&gt;
-&lt;li&gt;Set the editor to the ino file, or else your translated text will be writing to the last file you opened by default.&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;Sketch&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sketch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getEditor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getSketch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;folder&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sketch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getFolder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getParentFile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;header&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;folder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAbsolutePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;separator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fileName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;InputStream&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getClass&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getResource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;/com/ardublock/translator/block/dfrobot/&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fileName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;openStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;OutputStream&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;FileOutputStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;byte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;byte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bytesRead&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytesRead&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bytesRead&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h2&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;You can easily add new module for &lt;strong&gt;simple input and output&lt;/strong&gt;.
-You have to drill down to the &lt;code&gt;Translator&lt;/code&gt; core for advanced code generation, but it is not a very difficult task because the source code is quite well orgnized. Thumbs up to the &lt;a href=&quot;http://blog.ardublock.com&quot;&gt;Arublock&lt;/a&gt; team.&lt;/p&gt;
-</description>
-        <pubDate>Sat, 22 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/22/Hacking-Ardublock.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/22/Hacking-Ardublock.html</guid>
         
         <category>Visual</category>
         

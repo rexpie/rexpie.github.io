@@ -84,21 +84,20 @@
 
 <p>I changed the configuration to match our need for mqtt connections.</p>
 
-<div class="highlight"><pre><code class="language-cfg" data-lang="cfg"><span class="err">listen</span> <span class="err">mqtt</span>
-  <span class="err">bind</span> <span class="err">*:1883</span>
-  <span class="err">bind</span> <span class="err">*:1884</span>
-  <span class="err">mode</span> <span class="err">tcp</span>
-  <span class="err">maxconn</span> <span class="err">200000</span>
-  <span class="err">option</span> <span class="err">tcplog</span>
-  <span class="err">option</span> <span class="err">redispatch</span>
-  <span class="err">balance</span> <span class="err">leastconn</span>
-  <span class="err">server</span> <span class="err">serv1</span> <span class="err">192.168.0.36:1883</span> <span class="err">source</span> <span class="err">0.0.0.0:1024-65535</span> <span class="err">check</span>
-  <span class="err">server</span> <span class="err">serv2</span> <span class="err">192.168.0.136:1883</span> <span class="err">source</span> <span class="err">0.0.0.0:1024-65535</span> <span class="err">check</span>
+<p><figure class="highlight"><pre><code class="language-cfg" data-lang="cfg">listen mqtt
+  bind <em>:1883
+  bind </em>:1884
+  mode tcp
+  maxconn 200000
+  option tcplog
+  option redispatch
+  balance leastconn
+  server serv1 192.168.0.36:1883 source 0.0.0.0:1024-65535 check
+  server serv2 192.168.0.136:1883 source 0.0.0.0:1024-65535 check</p>
 
-<span class="err">listen</span> <span class="err">stats</span> <span class="err">*:1936</span>
-  <span class="err">stats</span> <span class="err">enable</span>
-  <span class="err">stats</span> <span class="err">uri</span> <span class="err">/</span></code></pre></div>
-
+<p>listen stats *:1936
+  stats enable
+  stats uri /</code></pre></figure></p>
 
 <h2>Configurations explained</h2>
 
