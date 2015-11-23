@@ -1,0 +1,117 @@
+<h1>Localizing Blockly within WKwebView</h1>
+
+<h2>Add translation for Blockly</h2>
+
+<p>Setup the block declaration code using Blockly.Msg.<LOCALIZED_STRING> and prepare
+the language files under msg/json folder. When you compile blockly they will get
+compiled as well.</p>
+
+<h2>Import translation file in WKWebview</h2>
+
+<p>Now import that compiled language file. Of course we don't want to hard-code so
+we setup the language in the localizable strings file:</p>
+
+<p>In localizable.strings(Base):</p>
+
+<pre><code>  "language" = "en";
+</code></pre>
+
+<p>In localizable.strings(Simplified Chinese):</p>
+
+<pre><code>  "language" = "zh-hans";
+</code></pre>
+
+<p>Then we can load the language property into the user script. Note we put this code
+at the <em>End</em> of the document so it overrides default language source.</p>
+
+<pre><code>  let language = NSLocalizedString("language", comment:"")
+  if let languageJSPath = NSBundle.mainBundle().pathForResource(language, ofType: "js", inDirectory: "blockly/msg/js") {
+    do {
+        let languageJS = try NSString(contentsOfFile: languageJSPath, encoding: NSUTF8StringEncoding) as String
+        let languageScript = WKUserScript(source: languageJS, injectionTime: .AtDocumentEnd, forMainFrameOnly: true)
+        userContentController.addUserScript(languageScript)
+    } catch {
+        print("Cannot load lang file")
+    }
+  }
+</code></pre>
+
+<h2>Localizing HTML</h2>
+
+<p>Next we should localize HTML elements.</p>
+
+<p><a href="http://www.localeplanet.com/support/howto-localize-js.html">This article</a> is
+good practice for JS based dynamic localization. I followed it with a few tweaks.</p>
+
+<h3>Localizing Blockly Toolbox</h3>
+
+<p>Blockly Toolbox is defined in the HTML page using XML element. Then <code>toolbox.js</code> waltzes
+in and dynamically creates a virtual dom. So we should go into the code and intercept
+ the creation.</p>
+
+<p>In <code>toolbox.js</code>, in function <code>Blockly.Toolbox.prototype.populate_</code>, make the
+following change:</p>
+
+<pre><code> var childOut = rootOut.createNode(_(childIn.getAttribute('name')));
+</code></pre>
+
+<p>Then use these regex on your HTML to mark the strings:</p>
+
+<pre><code>find regex:   category name="([^"]*)"
+replace with: category name="_('$1')"
+</code></pre>
+
+<p>Then use gettext to generate the <code>po</code> file:</p>
+
+<pre><code>xgettext.pl apps/blocklyduino/BigBee.html
+</code></pre>
+
+<p>Use the tools of your choice to translate.</p>
+
+<p>After that, you can generate the messages file using:</p>
+
+<pre><code>po2js.py messages.po
+</code></pre>
+
+<p>This creates a messages.js file that you can directly embed in
+your HTML:
+```</p>
+
+<script type="text/javascript" src="../../translate_compressed.js"></script>
+
+
+<script type="text/javascript" src="../../messages.js"></script>
+
+
+<pre><code>
+You may need to install the `polib` for `python`:
+</code></pre>
+
+<p>pip install polib
+```</p>
+
+<blockquote><p>But how do we dynamically choose which file should we use for
+translation?</p></blockquote>
+
+<p>Luckly, WKWebView has the <code>navigation.language</code> property that we
+can use. We can add this snippet to the translation file:</p>
+
+<pre><code>var translate = function(text) {
+  if (!navigator.language || navigator.language === "en-us") {
+    return text;
+  }
+</code></pre>
+
+<p>As for the other elements in the HTML file, we can use this
+pattern:</p>
+
+<pre><code>var buttons = ['btnUpload', 'btnLoadExample', 'btnDiscard'];
+buttons.map(function(buttonId){
+  document.getElementById(buttonId).innerHTML = _(document.getElementById(buttonId).innerHTML);
+});
+</code></pre>
+
+<h3>Optional</h3>
+
+<p>You can use
+<a href="http://closure-compiler.appspot.com/home">this link</a> to compile/compress your js code.</p>

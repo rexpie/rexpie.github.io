@@ -6,9 +6,136 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 22 Nov 2015 15:09:11 +0800</pubDate>
-    <lastBuildDate>Sun, 22 Nov 2015 15:09:11 +0800</lastBuildDate>
+    <pubDate>Mon, 23 Nov 2015 17:48:18 +0800</pubDate>
+    <lastBuildDate>Mon, 23 Nov 2015 17:48:18 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>Localizing Blockly</title>
+        <description>&lt;h1&gt;Localizing Blockly within WKwebView&lt;/h1&gt;
+
+&lt;h2&gt;Add translation for Blockly&lt;/h2&gt;
+
+&lt;p&gt;Setup the block declaration code using Blockly.Msg.&lt;LOCALIZED_STRING&gt; and prepare
+the language files under msg/json folder. When you compile blockly they will get
+compiled as well.&lt;/p&gt;
+
+&lt;h2&gt;Import translation file in WKWebview&lt;/h2&gt;
+
+&lt;p&gt;Now import that compiled language file. Of course we don&#39;t want to hard-code so
+we setup the language in the localizable strings file:&lt;/p&gt;
+
+&lt;p&gt;In localizable.strings(Base):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  &quot;language&quot; = &quot;en&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In localizable.strings(Simplified Chinese):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  &quot;language&quot; = &quot;zh-hans&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we can load the language property into the user script. Note we put this code
+at the &lt;em&gt;End&lt;/em&gt; of the document so it overrides default language source.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  let language = NSLocalizedString(&quot;language&quot;, comment:&quot;&quot;)
+  if let languageJSPath = NSBundle.mainBundle().pathForResource(language, ofType: &quot;js&quot;, inDirectory: &quot;blockly/msg/js&quot;) {
+    do {
+        let languageJS = try NSString(contentsOfFile: languageJSPath, encoding: NSUTF8StringEncoding) as String
+        let languageScript = WKUserScript(source: languageJS, injectionTime: .AtDocumentEnd, forMainFrameOnly: true)
+        userContentController.addUserScript(languageScript)
+    } catch {
+        print(&quot;Cannot load lang file&quot;)
+    }
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Localizing HTML&lt;/h2&gt;
+
+&lt;p&gt;Next we should localize HTML elements.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.localeplanet.com/support/howto-localize-js.html&quot;&gt;This article&lt;/a&gt; is
+good practice for JS based dynamic localization. I followed it with a few tweaks.&lt;/p&gt;
+
+&lt;h3&gt;Localizing Blockly Toolbox&lt;/h3&gt;
+
+&lt;p&gt;Blockly Toolbox is defined in the HTML page using XML element. Then &lt;code&gt;toolbox.js&lt;/code&gt; waltzes
+in and dynamically creates a virtual dom. So we should go into the code and intercept
+ the creation.&lt;/p&gt;
+
+&lt;p&gt;In &lt;code&gt;toolbox.js&lt;/code&gt;, in function &lt;code&gt;Blockly.Toolbox.prototype.populate_&lt;/code&gt;, make the
+following change:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; var childOut = rootOut.createNode(_(childIn.getAttribute(&#39;name&#39;)));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then use these regex on your HTML to mark the strings:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;find regex:   category name=&quot;([^&quot;]*)&quot;
+replace with: category name=&quot;_(&#39;$1&#39;)&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then use gettext to generate the &lt;code&gt;po&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;xgettext.pl apps/blocklyduino/BigBee.html
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Use the tools of your choice to translate.&lt;/p&gt;
+
+&lt;p&gt;After that, you can generate the messages file using:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;po2js.py messages.po
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This creates a messages.js file that you can directly embed in
+your HTML:
+```&lt;/p&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;../../translate_compressed.js&quot;&gt;&lt;/script&gt;
+
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;../../messages.js&quot;&gt;&lt;/script&gt;
+
+
+&lt;pre&gt;&lt;code&gt;
+You may need to install the `polib` for `python`:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;pip install polib
+```&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;But how do we dynamically choose which file should we use for
+translation?&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;Luckly, WKWebView has the &lt;code&gt;navigation.language&lt;/code&gt; property that we
+can use. We can add this snippet to the translation file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var translate = function(text) {
+  if (!navigator.language || navigator.language === &quot;en-us&quot;) {
+    return text;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As for the other elements in the HTML file, we can use this
+pattern:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var buttons = [&#39;btnUpload&#39;, &#39;btnLoadExample&#39;, &#39;btnDiscard&#39;];
+buttons.map(function(buttonId){
+  document.getElementById(buttonId).innerHTML = _(document.getElementById(buttonId).innerHTML);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Optional&lt;/h3&gt;
+
+&lt;p&gt;You can use
+&lt;a href=&quot;http://closure-compiler.appspot.com/home&quot;&gt;this link&lt;/a&gt; to compile/compress your js code.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 23 Nov 2015 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2015/11/23/localizing-blockly.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2015/11/23/localizing-blockly.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Hacking Blockly</title>
@@ -840,75 +967,6 @@ For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12
         <category>mqtt</category>
         
         <category>mosquitto</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Extending Scratch</title>
-        <description>&lt;h2&gt;Why Scratch&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://scratch.mit.edu/&quot;&gt;Scratch2&lt;/a&gt; is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.&lt;/p&gt;
-
-&lt;p&gt;We focus on how to leverage Scratch to further enable hardware interaction for the young.&lt;/p&gt;
-
-&lt;p&gt;The challenge is extending Scratch and make it talk to the various boards and devices.&lt;/p&gt;
-
-&lt;h2&gt;But How?&lt;/h2&gt;
-
-&lt;p&gt;Here is the architecture of the Scratch extension module. Note this is still under development by the Scratch team and is subject to change.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Scratch2.png&quot; title=&quot;Scratch Architecture&quot; alt=&quot;Scratch arch&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;You can also check the &lt;a href=&quot;http://wiki.scratch.mit.edu/wiki/Scratch_Extension&quot;&gt;official extension wiki&lt;/a&gt; to get the latest updated info.&lt;/p&gt;
-
-&lt;h2&gt;What else?&lt;/h2&gt;
-
-&lt;p&gt;As you can see in the architecture diagram, you will need a &lt;strong&gt;helper app&lt;/strong&gt; to enable the communication as Scratch does not speak on channels other than the &lt;code&gt;HTTP&lt;/code&gt; protocol.&lt;/p&gt;
-
-&lt;p&gt;What you need is a third party, preferrably open sourced project to do that. Your helper app should act as an &lt;code&gt;HTTP proxy&lt;/code&gt; and talk to Scratch &lt;strong&gt;AND&lt;/strong&gt; it should also be able to talk to the board via serial ports.&lt;/p&gt;
-
-&lt;h2&gt;Who&#39;s doing this&lt;/h2&gt;
-
-&lt;p&gt;Let&#39;s take a look at some open source initiatives&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;http://johnny-five.io&quot;&gt;johnny-five&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://github.com/MrYsLab/s2a_fm&quot;&gt;s2a_fm&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt; Both projct is based on the &lt;a href=&quot;http://firmata.org/&quot;&gt;Firmata&lt;/a&gt; protocol.&lt;/p&gt;
-
-&lt;h3&gt;johnny-five&lt;/h3&gt;
-
-&lt;p&gt;This popular project is node-js based. Highly configurable, actively maintained and very popular. You can leverage the server module of the nodejs project and easily put together a helper app with very little code.&lt;/p&gt;
-
-&lt;p&gt;Some sample code:&lt;/p&gt;
-
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;johnny-five&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ready&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;five&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;nx&quot;&gt;led&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;blink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
-
-&lt;h3&gt;s2a_fm&lt;/h3&gt;
-
-&lt;p&gt;This project bases on PyMata, a firmata Python client. It already integrated the server request handling and Firmata communication. You can extend the existing modules within the framework relatively easily.&lt;/p&gt;
-
-&lt;p&gt;Here is a &lt;a href=&quot;https://www.youtube.com/watch?v=tUv_Uu_SqZk&quot;&gt;video&lt;/a&gt; for s2a_fm based project&lt;/p&gt;
-
-&lt;p&gt;You can choose whichever project you are comfortable with.&lt;/p&gt;
-</description>
-        <pubDate>Sun, 23 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/23/extending-scratch.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/23/extending-scratch.html</guid>
-        
-        <category>Visual</category>
-        
-        <category>Programming</category>
         
         
       </item>
