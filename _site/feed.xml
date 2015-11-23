@@ -6,12 +6,12 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 23 Nov 2015 17:48:18 +0800</pubDate>
-    <lastBuildDate>Mon, 23 Nov 2015 17:48:18 +0800</lastBuildDate>
+    <pubDate>Mon, 23 Nov 2015 20:22:39 +0800</pubDate>
+    <lastBuildDate>Mon, 23 Nov 2015 20:22:39 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title>Localizing Blockly</title>
+        <title>Localizing Ardublock</title>
         <description>&lt;h1&gt;Localizing Blockly within WKwebView&lt;/h1&gt;
 
 &lt;h2&gt;Add translation for Blockly&lt;/h2&gt;
@@ -20,7 +20,7 @@
 the language files under msg/json folder. When you compile blockly they will get
 compiled as well.&lt;/p&gt;
 
-&lt;h2&gt;Import translation file in WKWebview&lt;/h2&gt;
+&lt;h2&gt;Import translation file in WKwebView&lt;/h2&gt;
 
 &lt;p&gt;Now import that compiled language file. Of course we don&#39;t want to hard-code so
 we setup the language in the localizable strings file:&lt;/p&gt;
@@ -88,8 +88,9 @@ replace with: category name=&quot;_(&#39;$1&#39;)&quot;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;This creates a messages.js file that you can directly embed in
-your HTML:
-```&lt;/p&gt;
+your HTML:&lt;/p&gt;
+
+&lt;p&gt;```&lt;/p&gt;
 
 &lt;script type=&quot;text/javascript&quot; src=&quot;../../translate_compressed.js&quot;&gt;&lt;/script&gt;
 
@@ -104,10 +105,12 @@ You may need to install the `polib` for `python`:
 &lt;p&gt;pip install polib
 ```&lt;/p&gt;
 
+&lt;p&gt;You might wonder,&lt;/p&gt;
+
 &lt;blockquote&gt;&lt;p&gt;But how do we dynamically choose which file should we use for
 translation?&lt;/p&gt;&lt;/blockquote&gt;
 
-&lt;p&gt;Luckly, WKWebView has the &lt;code&gt;navigation.language&lt;/code&gt; property that we
+&lt;p&gt;Luckly, WKwebView has the &lt;code&gt;navigation.language&lt;/code&gt; property that we
 can use. We can add this snippet to the translation file:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;var translate = function(text) {
@@ -133,6 +136,10 @@ buttons.map(function(buttonId){
         <pubDate>Mon, 23 Nov 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/11/23/localizing-blockly.html</link>
         <guid isPermaLink="true">http://rexpie.github.io/2015/11/23/localizing-blockly.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
         
         
       </item>

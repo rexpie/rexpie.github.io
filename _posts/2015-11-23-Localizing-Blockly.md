@@ -1,3 +1,10 @@
+---
+comments: true
+layout: post
+title:  "Localizing Ardublock"
+tags: Visual Programming
+---
+
 # Localizing Blockly within WKwebView
 
 ## Add translation for Blockly
@@ -5,7 +12,7 @@ Setup the block declaration code using Blockly.Msg.<LOCALIZED_STRING> and prepar
 the language files under msg/json folder. When you compile blockly they will get
 compiled as well.
 
-## Import translation file in WKWebview
+## Import translation file in WKwebView
 Now import that compiled language file. Of course we don't want to hard-code so
 we setup the language in the localizable strings file:
 
@@ -77,8 +84,10 @@ After that, you can generate the messages file using:
 ```
 po2js.py messages.po
 ```
+
 This creates a messages.js file that you can directly embed in
 your HTML:
+
 ```
 <script type="text/javascript" src="../../translate_compressed.js"></script>
 <script type="text/javascript" src="../../messages.js"></script>
@@ -90,10 +99,11 @@ You may need to install the `polib` for `python`:
 pip install polib
 ```
 
+You might wonder,
 > But how do we dynamically choose which file should we use for
 translation?
 
-Luckly, WKWebView has the `navigation.language` property that we
+Luckly, WKwebView has the `navigation.language` property that we
 can use. We can add this snippet to the translation file:
 
 ```
