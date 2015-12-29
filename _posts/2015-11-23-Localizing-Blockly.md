@@ -1,7 +1,7 @@
 ---
 comments: true
 layout: post
-title:  "Localizing Ardublock"
+title:  "Localizing Blockly"
 tags: Visual Programming
 ---
 

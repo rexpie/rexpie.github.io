@@ -1,0 +1,142 @@
+{
+  "name": "Rex Xia",
+  "info": {
+    "label": "Programmer",
+    "image": "http://imgur.com/eoHMttt",
+    "brief": "I am a software engineer and a hardware enthusiast. I am interested in anything that acts and/or reacts by design or, even better, on its own."
+  },
+  "contact": {
+    "email": "rexpie@gmail.com",
+    "phone": "(+86) 13818860403",
+    "website": "http://rexpie.github.io"
+  },
+  "location": {
+    "city": "Shanghai",
+    "country": "China"
+  },
+  "employment": {
+    "history": [
+      {
+        "position": "Senior Software Engineer",
+        "employer": "DFRobot",
+        "summary": "Responsible for managing and developing core mobile application projects, cloud services and internet of things infrastructure. Jointly runs the software squad.",
+        "start": "2015-07-25",
+        "url": "http://www.dfrobot.com",
+        "keywords": "Mobile development, IoT, Full Stack",
+        "highlights": [
+          "Built the first mobile applications to flash wirelessly to Bluno(Arduino with built-in BLE), using visual programming language",
+          "Contribution to core framework"
+        ]
+      },
+      {
+        "position": "Associate",
+        "employer": "Morgan Stanley",
+        "summary": "Software engineer building and supporting trade surveillance systems that empower the regulatory and compliance department.",
+        "start": "2013-04-08",
+        "end": "2015-05-25",
+        "url": "http://www.ms.com",
+        "keywords": "Trade Surveillance",
+        "highlights": [
+          "Built the largest surveillance model at the time",
+          "Major contribution to core framework"
+        ]
+      }
+    ]
+  },
+  "education": {
+    "history": [
+      {
+        "institution": "Shanghai Jiaotong University",
+        "start": "2010-09-01",
+        "end": "2013-03-30",
+        "summary": "Score ranking 2/98",
+        "area": "Software Engineering",
+        "studyType": "Graduate"
+      },
+      {
+        "institution": "Shanghai Jiaotong University",
+        "start": "2006-09-01",
+        "end": "2010-07-01",
+        "summary": "Score ranking 11/85",
+        "area": "Software Engineering",
+        "studyType": "Undergraduate"
+      }
+    ]
+  },
+  "skills": {
+    "sets": [
+      {
+        "name": "Mobile/Frontend Development",
+        "level": "Master",
+        "skills": [
+          "HTML",
+          "CSS",
+          "Javascript",
+          "Android",
+          "IOS",
+          "JQuery"
+        ]
+      },
+      {
+        "name": "Server Side",
+        "level": "Master",
+        "skills": [
+          "nodejs",
+          "Java",
+          "C++",
+          "mongodb",
+          "mysql"
+        ]
+      },
+      {
+        "name": "Embedded",
+        "level": "Intermediate",
+        "skills": [
+          "Arduino",
+          "mqtt",
+          "ble",
+          "Intel Edison"
+        ]
+      }
+    ]
+  },
+  "recognition": [
+    {
+      "title": "Challenge Cup",
+      "date": "2011-11-01",
+      "from": "Central Committee of CYLC",
+      "summary": "Outstanding Award"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Sports",
+      "keywords": [
+        "Badminton",
+        "Swimming"
+      ]
+    },
+    {
+      "name": "Puzzles",
+      "keywords": [
+        "Game theory",
+        "Strategy",
+        "Statistics"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Fluent/Professional"
+    },
+    {
+      "language": "Mandarin",
+      "fluency": "Native Speaker"
+    },
+    {
+      "language": "Japanese",
+      "fluency": "Elementary"
+    }
+  ]
+}
