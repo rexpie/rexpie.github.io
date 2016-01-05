@@ -6,9 +6,49 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 05 Jan 2016 14:29:20 +0800</pubDate>
-    <lastBuildDate>Tue, 05 Jan 2016 14:29:20 +0800</lastBuildDate>
+    <pubDate>Tue, 05 Jan 2016 14:36:17 +0800</pubDate>
+    <lastBuildDate>Tue, 05 Jan 2016 14:36:17 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>Blockly Multitouch Bug Fix</title>
+        <description>&lt;h1&gt;The Bug&lt;/h1&gt;
+
+&lt;p&gt;I am building a mobile visual programming app for &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=1044#.UoyIUpH7k8M&quot;&gt;Bluno&lt;/a&gt; and its compatible devices.
+Long story short, there is a bug on both IOS and Android that convinces me that Blockly is not doing things right.&lt;/p&gt;
+
+&lt;p&gt;When I swipe my fingers across Blockly workspace, sometimes the rest of the HTML page stops responding to taps or swipes. At first I thought it was issue of event binding of &lt;code&gt;touchStart&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt;. I changed all my &lt;code&gt;onClick&lt;/code&gt; attributes to &lt;code&gt;Blockly.bindEvent_&lt;/code&gt; calls. It worked for some time until I can&#39;t scroll the Arduino code text view.&lt;/p&gt;
+
+&lt;p&gt;I spent two days debugging and found the bug.&lt;/p&gt;
+
+&lt;h2&gt;The fix&lt;/h2&gt;
+
+&lt;p&gt;On a touch device with multitouch support, multiple &lt;code&gt;touchStart&lt;/code&gt; events can be fired together. This causes multiple calls to &lt;code&gt;Blockly.WorkspaceSvg.prototype.onMouseDown_&lt;/code&gt; event handler.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    if (&#39;mouseup&#39; in Blockly.bindEvent_.TOUCH_MAP) {
+      Blockly.onTouchUpWrapper_ =
+          Blockly.bindEvent_(document, &#39;mouseup&#39;, null, Blockly.onMouseUp_);
+    }
+    Blockly.onMouseMoveWrapper_ =
+        Blockly.bindEvent_(document, &#39;mousemove&#39;, null, Blockly.onMouseMove_);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This code binds multiple events to the document element but only the last call actually registers the event handler wrapper, which will consequently be called in the global &lt;code&gt;Blockly.onMouseUp_&lt;/code&gt; handler.&lt;/p&gt;
+
+&lt;p&gt;This can cause event handlers for &lt;code&gt;mouseMove&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt; linger in the &lt;code&gt;document&lt;/code&gt; node, causing other elements on the DOM tree to disfunction.&lt;/p&gt;
+
+&lt;p&gt;The fix is relatively straightforward.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 05 Jan 2016 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2016/01/05/blockly-multitouch-bug.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2016/01/05/blockly-multitouch-bug.html</guid>
+        
+        <category>Visual</category>
+        
+        <category>Programming</category>
+        
+        
+      </item>
     
       <item>
         <title>Localizing Blockly</title>
@@ -136,46 +176,6 @@ buttons.map(function(buttonId){
         <pubDate>Mon, 23 Nov 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/11/23/localizing-blockly.html</link>
         <guid isPermaLink="true">http://rexpie.github.io/2015/11/23/localizing-blockly.html</guid>
-        
-        <category>Visual</category>
-        
-        <category>Programming</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Blockly Multitouch Bug Fix</title>
-        <description>&lt;h1&gt;The Bug&lt;/h1&gt;
-
-&lt;p&gt;I am building a mobile visual programming app for &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=1044#.UoyIUpH7k8M&quot;&gt;Bluno&lt;/a&gt; and its compatible devices.
-Long story short, there is a bug on both IOS and Android that convinces me that Blockly is not doing things right.&lt;/p&gt;
-
-&lt;p&gt;When I swipe my fingers across Blockly workspace, sometimes the rest of the HTML page stops responding to taps or swipes. At first I thought it was issue of event binding of &lt;code&gt;touchStart&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt;. I changed all my &lt;code&gt;onClick&lt;/code&gt; attributes to &lt;code&gt;Blockly.bindEvent_&lt;/code&gt; calls. It worked for some time until I can&#39;t scroll the Arduino code text view.&lt;/p&gt;
-
-&lt;p&gt;I spent two days debugging and found the bug.&lt;/p&gt;
-
-&lt;h2&gt;The fix&lt;/h2&gt;
-
-&lt;p&gt;On a touch device with multitouch support, multiple &lt;code&gt;touchStart&lt;/code&gt; events can be fired together. This causes multiple calls to &lt;code&gt;Blockly.WorkspaceSvg.prototype.onMouseDown_&lt;/code&gt; event handler.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;    if (&#39;mouseup&#39; in Blockly.bindEvent_.TOUCH_MAP) {
-      Blockly.onTouchUpWrapper_ =
-          Blockly.bindEvent_(document, &#39;mouseup&#39;, null, Blockly.onMouseUp_);
-    }
-    Blockly.onMouseMoveWrapper_ =
-        Blockly.bindEvent_(document, &#39;mousemove&#39;, null, Blockly.onMouseMove_);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This code binds multiple events to the document element but only the last call actually registers the event handler wrapper, which will consequently be called in the global &lt;code&gt;Blockly.onMouseUp_&lt;/code&gt; handler.&lt;/p&gt;
-
-&lt;p&gt;This can cause event handlers for &lt;code&gt;mouseMove&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt; linger in the &lt;code&gt;document&lt;/code&gt; node, causing other elements on the DOM tree to disfunction.&lt;/p&gt;
-
-&lt;p&gt;The fix is relatively straightforward.&lt;/p&gt;
-</description>
-        <pubDate>Mon, 23 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/11/23/blockly-multitouch-bug.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/11/23/blockly-multitouch-bug.html</guid>
         
         <category>Visual</category>
         
