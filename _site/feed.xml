@@ -6,9 +6,126 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 05 Jan 2016 14:36:17 +0800</pubDate>
-    <lastBuildDate>Tue, 05 Jan 2016 14:36:17 +0800</lastBuildDate>
+    <pubDate>Thu, 14 Jan 2016 11:33:59 +0800</pubDate>
+    <lastBuildDate>Thu, 14 Jan 2016 11:33:59 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>Socket.io For Multiple User Game</title>
+        <description>&lt;h1&gt;There Will Be a Party&lt;/h1&gt;
+
+&lt;p&gt;So everyone was assigned to come up with a party game. My first few ideas sucked. Then I tried to move on to something geeky and came across the idea of multiple user games.&lt;/p&gt;
+
+&lt;p&gt;I need to build a simple game, real time that supports multiple players and in a non-compete but hard to cooperate way.&lt;/p&gt;
+
+&lt;h1&gt;The Maze&lt;/h1&gt;
+
+&lt;p&gt;Let&#39;s get through the maze together, like, 100 of us. Seems easy enough for one patient player, but could have unexpected results for a group of people. It will suddenly becomes hard when players try to make a narrow turn.&lt;/p&gt;
+
+&lt;p&gt;First, start with a maze. Just grab one &lt;a href=&quot;http://www.codeproject.com/Articles/577080/Create-an-HTML5-and-JavaScript-Maze-Game-with-a-timer&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The tricky part is setup the multiple user control. We need to have something fast, lightweight, and easy to write, born async and browser-based.&lt;/p&gt;
+
+&lt;h1&gt;The Control&lt;/h1&gt;
+
+&lt;p&gt;In comes socket.io. There is a collaborative canvas in their official documents. But actually the simplest example would be helpful enough. I did not use the &lt;code&gt;Express&lt;/code&gt; framework because it is a single page game app.&lt;/p&gt;
+
+&lt;h2&gt;Client side - control pad&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&quot;HTML&quot;&gt;    &amp;lt;script src=&quot;https://cdn.socket.io/socket.io-1.4.4.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+
+    &amp;lt;script&amp;gt;
+        var socket;
+        socket = io(&#39;http://127.0.0.1:8888&#39;);
+    &amp;lt;/script&amp;gt;
+    &amp;lt;div class=&quot;table-cell&quot; ontouchstart=&quot;socket.emit(&#39;command&#39;,{control:38})&quot;&amp;gt;
+        &amp;lt;img class=&quot;rs rotate270&quot; src=&quot;arrow.png&quot; /&amp;gt;
+    &amp;lt;/div&amp;gt;
+
+    &amp;lt;style&amp;gt;
+    .rotate90 {
+        -ms-transform: rotate(90deg);
+        /* IE 9 */
+        -webkit-transform: rotate(90deg);
+        /* Chrome, Safari, Opera */
+        transform: rotate(90deg);
+    }
+    &amp;lt;/style&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notice I used &lt;code&gt;ontouchstart&lt;/code&gt; event listener. That&#39;s because this game is for mobile
+devices. On iOS devices there would be a 300ms delay if you want to trigger an &lt;code&gt;onclick&lt;/code&gt;
+event, which makes this app appear to be slow. But it is not the socket.io part that
+slows down the reaction feedback loop, rather the built-in browser.&lt;/p&gt;
+
+&lt;p&gt;This is only one button setup. You need to add other three buttons in your preferred
+layout and style. Add in the event listeners and you are all set.&lt;/p&gt;
+
+&lt;h2&gt;Client side - maze app&lt;/h2&gt;
+
+&lt;p&gt;You still need to write the script tag to import socket.io library.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;    var socket = io.connect(&#39;http://127.0.0.1:8888&#39;);
+
+    socket.on(&#39;control&#39;, function(data) {
+      console.log(data);
+      var e = {
+        keyCode: data.control
+      };
+      moveRect(e);
+    });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Server side - messaging&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;    var app = require(&#39;http&#39;).createServer(handler);
+    var io = require(&#39;socket.io&#39;)(app);
+    var fs = require(&#39;fs&#39;);
+
+    app.listen(8888);
+
+    function handler(req, res) {
+      fs.readFile(__dirname + req.url,
+        function(err, data) {
+          if (err) {
+            res.writeHead(500);
+            return res.end(&#39;Error loading:&#39; + req.url);
+          }
+
+          res.writeHead(200);
+          res.end(data);
+        });
+    }
+
+    io.on(&#39;connection&#39;, function(socket) {
+      socket.on(&#39;command&#39;, function(data) {
+        console.log(data);
+        // *important*: io.emit is global emit
+        // If we use `socket.emit` here, the socket we use would be the same
+        // socket we are receiving data, which is on the controller pad webpage.
+        // That means the maze game app is not getting the data it needs.
+        // We need to send the control message by broadcasting to the maze game app.
+        io.emit(&#39;control&#39;, data);
+      });
+    });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It is worth mentioning that you need to separate the two channels, one from game pad
+to the server and the other one from server to the maze app.&lt;/p&gt;
+
+&lt;p&gt;You can use two event names, or you can put them in different socket namespaces.
+Either way you don&#39;t want inadvertent infinite message loop.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 14 Jan 2016 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2016/01/14/socketio.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2016/01/14/socketio.html</guid>
+        
+        <category>socket.io</category>
+        
+        <category>game</category>
+        
+        
+      </item>
     
       <item>
         <title>Blockly Multitouch Bug Fix</title>
@@ -831,55 +948,6 @@ npm install serialport
         <category>load</category>
         
         <category>balancing,</category>
-        
-        <category>mosquitto</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Mosquitto Troubleshooting</title>
-        <description>&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
-
-&lt;p&gt;When I tried to execute the &lt;code&gt;mosquitto_pub&lt;/code&gt; command, it complains about a lib missing:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
-mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot open shared object file: No such file or directory
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I &lt;strong&gt;built&lt;/strong&gt; this from source. Well seems like mosquitto needs a bit more consistent at housekeeping when it tries to install and execute.&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s dig in.&lt;/p&gt;
-
-&lt;p&gt;First use strace to look what it is looking for:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ strace mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
-open(&quot;/usr/lib/x86_64/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-stat(&quot;/usr/lib/x86_64&quot;, 0x7fff1e3b13f0) = -1 ENOENT (No such file or directory)
-open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Okay so it looks through &lt;code&gt;/usr/lib&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Where &lt;strong&gt;is&lt;/strong&gt; the lib then?&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ locate libmosquitto.so|xargs ls -l
-/usr/local/lib/libmosquitto.so
-/usr/local/lib/libmosquitto.so.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;So it looks at &lt;code&gt;/usr/lib&lt;/code&gt; rather than &lt;code&gt;/usr/local/lib&lt;/code&gt;. Fair enough, I did not specify the prefix when building.&lt;/p&gt;
-
-&lt;p&gt;Fix is easy:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-        <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/25/mosquitto-troubleshooting.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/25/mosquitto-troubleshooting.html</guid>
-        
-        <category>mqtt,</category>
         
         <category>mosquitto</category>
         
