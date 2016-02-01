@@ -1,0 +1,117 @@
+<h1 id="what-am-i-testing-for">What am I testing for</h1>
+
+<p>I am testing the server under a very <strong>specific</strong> scenario. Very large number of subscribers and publishers, but very little traffic for each one. I am trying to build a sensor network server with push capabilities.</p>
+
+<ul>
+  <li>It is written in C, with tiny memory footprints for each connection, unlike Apache’s ActiveMQ or Apollo which creates a thread object for every live connection.</li>
+  <li>It is single threaded</li>
+  <li>It is easy to install, simple to configure and quick to run</li>
+</ul>
+
+<p>I am not saying other brokers are not superior on those aspects. Simplicity is what I am after and after all, I think that managing a network of broker cluster exceeds the boundary of software design and need system architecture behind it. So I want to start with simple tests on a single server and see how it goes.</p>
+
+<p>Here is an <a href="http://w3yyb.sinaapp.com/archives/1601">article</a> ~~in Chinese~~ of an emperical study on MQTT broker performances. Basic translation of the conclusion is:</p>
+
+<ul>
+  <li>Downsides: Mosquitto only utilizes one CPU; EMQTT writes too much disk io and has low throughput; ActiveMQ/Apollo eats a lot of RAM and sometimes crashes.</li>
+  <li>Upsides: EMQTT &amp; Mosquitto are quite stable. EMQTT has high cuncurrent connection counts. Apache ones can use multicore.</li>
+</ul>
+
+<h1 id="prerequisites">Prerequisites</h1>
+
+<p>I am testing on two Linux/Unix like systems (actually they are 2 virtual Ubuntu desktop hosted in a VMWare env, if you must know) connected in the same LAN. Let’s call them <em>Alice</em> and <em>Bob</em>.</p>
+
+<h1 id="setting-up-the-environment">Setting up the environment</h1>
+
+<p>Here are the steps to execute the stress test. I can give you the results beforehand:</p>
+
+<blockquote>
+  <p>It can handle at least 20k simultanious connections at a speed of 7000+ messages per second for a single 2.1g core virtual server with just 12MB of mem.</p>
+</blockquote>
+
+<h2 id="changing-system-file-limitations">Changing System File Limitations</h2>
+
+<p><em>** Do this on both Alice and Bob **</em></p>
+
+<p>Your system may restrice open files per process and system-wide file handle counts.</p>
+
+<p>I found a <a href="https://rtcamp.com/tutorials/linux/increase-open-files-limit/">tutorial</a> for linux/Unix like systems.</p>
+
+<p>Basically you edit <code>/etc/security/limits.conf</code> and put in:</p>
+
+<p><code>*         hard    nofile      500000</code></p>
+
+<p><code>*         soft    nofile      500000</code></p>
+
+<p>You may also need to modify <code>/etc/sysctl.conf</code> and put in:</p>
+
+<p><code>fs.file-max = 2097152</code> and run <code>sysctl -p</code></p>
+
+<p><em>sudo if necessary</em></p>
+
+<h2 id="mosquitto-server">Mosquitto Server</h2>
+
+<p><em>** Do this on Alice **</em></p>
+
+<p>If you want to use the latest version, go to their official download <a href="http://mosquitto.org/download/">link</a>.</p>
+
+<p>Or if you want to quickly install a curated version for you system, you can also check out their recipes in the same page.</p>
+
+<p>I built the server from its source. I found out that I need:</p>
+
+<ul>
+  <li>g++</li>
+  <li>uuid-dev</li>
+  <li>libc-ares-dev</li>
+  <li>libssl-dev</li>
+</ul>
+
+<p>Then you can execute</p>
+
+<pre><code>make &amp;&amp; sudo make install
+</code></pre>
+
+<p>and check if you have <code>mosquitto</code> available after that.</p>
+
+<h2 id="configuring-and-starting-mosquitto">Configuring and Starting Mosquitto</h2>
+
+<p><em>** Do this on Alice **</em></p>
+
+<p>You can refer the <a href="http://mosquitto.org/man/mosquitto-conf-5.html">documentation</a> for the detailed parameters, but I focus on the <code>max_connections</code> configuration value and change it to <code>-1</code>(unlimited)</p>
+
+<p>Then just execute <code>mosquitto</code>. You can add the <code>-d</code> switch to run it in the background. I just like to see the logs.</p>
+
+<h2 id="benchmark-tool">Benchmark tool</h2>
+
+<p><em>** Do this on Bob **</em></p>
+
+<p>I used a pretty cool tool called <a href="https://github.com/takanorig/mqtt-bench">mqtt-bench</a></p>
+
+<p>I can’t get it to work using the <code>go get</code> command in its documentation, so I downloaded the <a href="https://github.com/takanorig/mqtt-bench/wiki/Download">binary</a> as it advised.</p>
+
+<h2 id="starting-test">Starting Test</h2>
+
+<p><em>** Do this on Bob **</em></p>
+
+<p>The CLI command for the benchmark tool looks like this:</p>
+
+<pre><code>./mqtt-bench  -action=p -broker="tcp://192.168.0.89:1883" -clients=20000 -count=10
+</code></pre>
+
+<h2 id="checking-status-on-alice">Checking Status on Alice</h2>
+
+<p><em>** Of course do this on Alice **</em></p>
+
+<p>You can use the <code>top</code> command to see the CPU and memory usage of Alice.
+For mine, I see a single core surge to 100 with a 0.3% memory ( out of 4G, so 12M ) when the connections are being accepted.</p>
+
+<p>You can also check the network connections using:</p>
+
+<pre><code>netstat -pant | grep mosquitto | wc -l
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I already gave the results.</p>
+
+<p><code>//TODO</code> Next time maybe I can use some more Bobs to connect to Alice and see how much fun they can have.</p>

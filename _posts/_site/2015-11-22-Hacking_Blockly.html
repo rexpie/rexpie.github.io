@@ -1,0 +1,48 @@
+<h1 id="blockly-touchdrag-events-tweaking">Blockly Touch/Drag Events Tweaking</h1>
+
+<h2 id="the-issue">The issue</h2>
+
+<blockquote>
+  <p>TL,DR: I want to enable scrolling with dragging on the flyout menu.</p>
+</blockquote>
+
+<p>I recently played with <a href="https://github.com/BlocklyDuino/BlocklyDuino">BlocklyDuino</a> a bit, and it was fun. I even embedded it into IOS app, using WKWebview and some JS bridging delegate.<br />
+Only problem is when I added too many blocks into one toolbox category, I need to scroll down the flyout menu to find what I want. Now on touch devices, scrolling is fairly popular interaction and users have high expectations for that. But the blockly flyout is not doing what I expect. As soon as you touch one block, a new block is immediately created and the flyout menu closes. You can only scroll by dragging the scrollbar handle, or you touch empty spaces between or beside the blocks and drag the scroll panel. These spaces are very tight for smaller devices, making it hard to manipulate the menu.</p>
+
+<h2 id="the-culprit">The culprit</h2>
+
+<p>After some code searching, the flyout.js file shows that the menu from toolbox has an <code>autoClose</code> attribute. So first,</p>
+
+<p><code>javascript
+Blockly.Flyout.prototype.autoClose = false;
+</code></p>
+
+<p>Then, we go to the place where new blocks are created, and change its behaviour:</p>
+
+<p><code>javascript
+// only create a new block when dragging towards the right. Try to scroll up and down when dragging vertically.
+if (Math.sqrt(dx * dx + dy * dy) &gt; Blockly.DRAG_RADIUS &amp;&amp; dx &gt; 2 * Math.abs(dy)) {
+  // Create the block.
+  Blockly.Flyout.startFlyout_.createBlockFunc_(Blockly.Flyout.startBlock_)(Blockly.Flyout.startDownEvent_);
+} else {
+  // dragging menu vertically
+  var metrics = Blockly.Flyout.startFlyout_.getMetrics_();
+  var y = metrics.viewTop - dy;
+  y = Math.min(y, metrics.contentHeight - metrics.viewHeight);
+  y = Math.max(y, 0);
+  Blockly.Flyout.startDownEvent_ = e;
+  Blockly.Flyout.startFlyout_.scrollbar_.set(y);
+}
+</code></p>
+
+<p>Also, we need to change the code where the flyout closes itself, this code is near the end of function <code>createBlockFunc_</code>. The tricky part is that the flyout menu for the context menu is also using this bit of code.</p>
+
+<p><code>javascript
+// Check if the flyout menu is popped out by toolbox or not. Do not hide the menu if context menu is calling this flyout.
+if (workspace.toolbox_ &amp;&amp; workspace.toolbox_.tree_) {
+  flyout.hide();
+  workspace.toolbox_.clearSelection();
+}
+</code></p>
+
+<p>And we are all set. The menu is scrollable via dragging vertically on the blocks as well. When you drag a block to the right, a new block is created and the flyout menu also closes itself.</p>

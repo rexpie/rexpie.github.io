@@ -1,0 +1,102 @@
+<h1 id="there-will-be-a-party">There Will Be a Party</h1>
+<p>So everyone was assigned to come up with a party game. My first few ideas sucked. Then I tried to move on to something geeky and came across the idea of multiple user games.</p>
+
+<p>I need to build a simple game, real time that supports multiple players and in a non-compete but hard to cooperate way.</p>
+
+<h1 id="the-maze">The Maze</h1>
+<p>Let’s get through the maze together, like, 100 of us. Seems easy enough for one patient player, but could have unexpected results for a group of people. It will suddenly becomes hard when players try to make a narrow turn.</p>
+
+<p>First, start with a maze. Just grab one <a href="http://www.codeproject.com/Articles/577080/Create-an-HTML5-and-JavaScript-Maze-Game-with-a-timer">here</a>.</p>
+
+<p>The tricky part is setup the multiple user control. We need to have something fast, lightweight, and easy to write, born async and browser-based.</p>
+
+<h1 id="the-control">The Control</h1>
+<p>In comes socket.io. There is a collaborative canvas in their official documents. But actually the simplest example would be helpful enough. I did not use the <code>Express</code> framework because it is a single page game app.</p>
+
+<h2 id="client-side---control-pad">Client side - control pad</h2>
+
+<p>```HTML
+    <script src="https://cdn.socket.io/socket.io-1.4.4.js"></script></p>
+
+<pre><code>&lt;script&gt;
+    var socket;
+    socket = io('http://127.0.0.1:8888');
+&lt;/script&gt;
+&lt;div class="table-cell" ontouchstart="socket.emit('command',{control:38})"&gt;
+    &lt;img class="rs rotate270" src="arrow.png" /&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.rotate90 {
+    -ms-transform: rotate(90deg);
+    /* IE 9 */
+    -webkit-transform: rotate(90deg);
+    /* Chrome, Safari, Opera */
+    transform: rotate(90deg);
+}
+&lt;/style&gt; ```
+</code></pre>
+
+<p>Notice I used <code>ontouchstart</code> event listener. That’s because this game is for mobile
+devices. On iOS devices there would be a 300ms delay if you want to trigger an <code>onclick</code>
+event, which makes this app appear to be slow. But it is not the socket.io part that
+slows down the reaction feedback loop, rather the built-in browser.</p>
+
+<p>This is only one button setup. You need to add other three buttons in your preferred
+layout and style. Add in the event listeners and you are all set.</p>
+
+<h2 id="client-side---maze-app">Client side - maze app</h2>
+<p>You still need to write the script tag to import socket.io library.</p>
+
+<p>```javascript
+    var socket = io.connect(‘http://127.0.0.1:8888’);</p>
+
+<pre><code>socket.on('control', function(data) {
+  console.log(data);
+  var e = {
+    keyCode: data.control
+  };
+  moveRect(e);
+}); ```
+</code></pre>
+
+<h2 id="server-side---messaging">Server side - messaging</h2>
+
+<p>```javascript
+    var app = require(‘http’).createServer(handler);
+    var io = require(‘socket.io’)(app);
+    var fs = require(‘fs’);</p>
+
+<pre><code>app.listen(8888);
+
+function handler(req, res) {
+  fs.readFile(__dirname + req.url,
+    function(err, data) {
+      if (err) {
+        res.writeHead(500);
+        return res.end('Error loading:' + req.url);
+      }
+
+      res.writeHead(200);
+      res.end(data);
+    });
+}
+
+io.on('connection', function(socket) {
+  socket.on('command', function(data) {
+    console.log(data);
+    // *important*: io.emit is global emit
+    // If we use `socket.emit` here, the socket we use would be the same
+    // socket we are receiving data, which is on the controller pad webpage.
+    // That means the maze game app is not getting the data it needs.
+    // We need to send the control message by broadcasting to the maze game app.
+    io.emit('control', data);
+  });
+}); ```
+</code></pre>
+
+<p>It is worth mentioning that you need to separate the two channels, one from game pad
+to the server and the other one from server to the maze app.</p>
+
+<p>You can use two event names, or you can put them in different socket namespaces.
+Either way you don’t want inadvertent infinite message loop.</p>

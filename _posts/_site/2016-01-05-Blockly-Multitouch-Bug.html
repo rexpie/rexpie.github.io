@@ -1,0 +1,26 @@
+<h1 id="the-bug">The Bug</h1>
+
+<p>I am building a mobile visual programming app for <a href="http://www.dfrobot.com/index.php?route=product/product&amp;product_id=1044#.UoyIUpH7k8M">Bluno</a> and its compatible devices.
+Long story short, there is a bug on both IOS and Android that convinces me that Blockly is not doing things right.</p>
+
+<p>When I swipe my fingers across Blockly workspace, sometimes the rest of the HTML page stops responding to taps or swipes. At first I thought it was issue of event binding of <code>touchStart</code> and <code>mouseDown</code>. I changed all my <code>onClick</code> attributes to <code>Blockly.bindEvent_</code> calls. It worked for some time until I can’t scroll the Arduino code text view.</p>
+
+<p>I spent two days debugging and found the bug.</p>
+
+<h2 id="the-fix">The fix</h2>
+<p>On a touch device with multitouch support, multiple <code>touchStart</code> events can be fired together. This causes multiple calls to <code>Blockly.WorkspaceSvg.prototype.onMouseDown_</code> event handler.</p>
+
+<p><code>
+    if ('mouseup' in Blockly.bindEvent_.TOUCH_MAP) {
+      Blockly.onTouchUpWrapper_ =
+          Blockly.bindEvent_(document, 'mouseup', null, Blockly.onMouseUp_);
+    }
+    Blockly.onMouseMoveWrapper_ =
+        Blockly.bindEvent_(document, 'mousemove', null, Blockly.onMouseMove_);
+</code></p>
+
+<p>This code binds multiple events to the document element but only the last call actually registers the event handler wrapper, which will consequently be called in the global <code>Blockly.onMouseUp_</code> handler.</p>
+
+<p>This can cause event handlers for <code>mouseMove</code> and <code>mouseDown</code> linger in the <code>document</code> node, causing other elements on the DOM tree to disfunction.</p>
+
+<p>The fix is relatively straightforward.</p>

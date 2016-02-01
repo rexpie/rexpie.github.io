@@ -1,0 +1,36 @@
+<h1 id="issues-with-mosquittopub">Issues with mosquitto_pub</h1>
+
+<p>When I tried to execute the <code>mosquitto_pub</code> command, it complains about a lib missing:</p>
+
+<pre><code>rex@ubuntu:~$ mosquitto_pub -t '/mqtt-bench/benchmark' -m 'testContent'
+mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot open shared object file: No such file or directory
+</code></pre>
+
+<p>I <strong>built</strong> this from source. Well seems like mosquitto needs a bit more consistent at housekeeping when it tries to install and execute.</p>
+
+<p>Let’s dig in.</p>
+
+<p>First use strace to look what it is looking for:</p>
+
+<pre><code>rex@ubuntu:~$ strace mosquitto_pub -t '/mqtt-bench/benchmark' -m 'testContent'
+open("/usr/lib/x86_64/libmosquitto.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/lib/x86_64", 0x7fff1e3b13f0) = -1 ENOENT (No such file or directory)
+open("/usr/lib/libmosquitto.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+</code></pre>
+
+<p>Okay so it looks through <code>/usr/lib</code>.</p>
+
+<p>Where <strong>is</strong> the lib then?</p>
+
+<pre><code>rex@ubuntu:~$ locate libmosquitto.so|xargs ls -l
+/usr/local/lib/libmosquitto.so
+/usr/local/lib/libmosquitto.so.1
+</code></pre>
+
+<p>So it looks at <code>/usr/lib</code> rather than <code>/usr/local/lib</code>. Fair enough, I did not specify the prefix when building.</p>
+
+<p>Fix is easy:</p>
+
+<pre><code>sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1
+</code></pre>
+

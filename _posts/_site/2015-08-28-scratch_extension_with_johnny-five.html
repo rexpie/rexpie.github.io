@@ -1,0 +1,67 @@
+<h1 id="scratch-extension-with-johnny-five">Scratch Extension with Johnny-five</h1>
+
+<p>Previous <a href="http://rexpie.github.io/2015/08/23/extending-scratch.html">article</a> illustrated the architecture of the Scratch extension.</p>
+
+<p>We can replace the PyMata part with anything that can act as a broker between Firmata and the HTTP.</p>
+
+<p>Nodejs has a rich library and <a href="http://johnny-five.io">Johnny-five</a>(J5) is one of the most popular Firmata clients. It is actively maintained by <a href="https://github.com/rwaldron">Rick Waldron</a> as of this document is written.</p>
+
+<p>I was amazed by how Rick handles issues with chips. I told him one of the LCD chip is not working well with j5 <a href="https://github.com/rwaldron/johnny-five/issues/326#issuecomment-135857146">link</a>. He said the would buy that chip online and test it after. He did things like this multiple times on other occasions as well. Hats off.</p>
+
+<h1 id="lets-do-this">Let’s do this</h1>
+
+<p>I want to build a version that works on Windows to start. Both x64 and x86 OS should be able to execute the binaries.</p>
+
+<p>Why does this matter? Isn’t Nodejs cross platform?</p>
+
+<p>Because we need to talk through the serial port. J5 depends on <a href="https://www.npmjs.com/package/serialport">serialport</a> package and usually it need compiling. The documents of <code>serialport</code> package has detailed instructions as how to deal with ‘build fail’ issues.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<ul>
+  <li>Nodejs x86 version for compatibility</li>
+  <li>Python 2.* matching OS bitness ( 32 for 32bit OS, 64 for 64bit OS)</li>
+</ul>
+
+<p>After you get your nodejs and python ready, remember to put the bin path into your PATH variable. Then you create a project path for the helper app. Let’s call it 5jhelper.</p>
+
+<pre><code>cd j5helper
+npm install johnny-five
+npm install serialport
+</code></pre>
+
+<p>Sometimes serialport will install successfully with johnny-five. If serialport failed to install, best solution would be RTFM and install it yourself. It says that it already has the binaries shipped with the package for most common use cases. I am not sure how it determines the binary version, but I have to build myself from time to time.</p>
+
+<blockquote>
+  <p>You <strong><em>MUST</em></strong> install the serialport package for this to work</p>
+</blockquote>
+
+<h2 id="building-helper-app-with-j5">Building Helper App with J5</h2>
+
+<p>You can go to the example folder in the j5 package and have some fun with whatever you have on your hand like Arduino and LED. Or you can checkout the <a href="https://www.youtube.com/results?search_query=nodebots">videos</a> as well.</p>
+
+<h3 id="http-server">HTTP Server</h3>
+
+<p>You can use the http module and make it listen on any port you have defined in your extension descriptor, by default the port id 12345.</p>
+
+<p>You need to remember to call <code>response.end()</code> promptly or Scratch will hold on to that HTTP request till it times out. The Scratch source code, at this time, is just a while loop firing HTTP requests on a single thread, so it blocks.</p>
+
+<p><em>Remember to send data back to Scratch as quickly as possible.</em></p>
+
+<p>You can parse the HTTP requests sent from Scratch easily as they are in a very simple <a href="https://github.com/LLK/scratchx/wiki">slash-delimited format</a>.</p>
+
+<h3 id="j5-backend">J5 backend</h3>
+
+<h4 id="caching-your-data">Caching your data</h4>
+<p>Usually j5 API returns very fast, you do not need to worry about the timings. But when you are dealing with loops it becomes somewhat more unpredictable, because writing to the serial device takes time, processing Firmata protocol on Arduino takes time and reflecting on the actual device also takes time. It becomes even slower when you are using a <a href="http://www.dfrobot.com/index.php?route=product/product&amp;product_id=1220&amp;search=ble&amp;description=true#.VeFMybR7wW8">USB bluetooth link</a> to wirelessly connect to your board.</p>
+
+<p>I tried to write messages to a LCD. The loop keeps the LCD blinking and flashing and rewriting. Every time a message arrives I call <code>lcd.clear()</code> then <code>lcd.print(msg)</code>.</p>
+
+<blockquote>
+  <p>Keep the output values cached, only write when the value changes.</p>
+</blockquote>
+
+<h1 id="disclaimer">Disclaimer</h1>
+
+<p>With the movement of ScratchX( now Beta) This document might be obsolete soon.</p>
+

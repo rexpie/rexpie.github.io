@@ -1,0 +1,144 @@
+<h1 id="fruit-piano-with-arduinoscratch">Fruit Piano with Arduino/Scratch</h1>
+
+<p>We have seen many interesting musical applications with Arduino <a href="https://www.youtube.com/watch?v=jAVE6T7FqJs">here</a> and <a href="https://www.youtube.com/watch?v=yRvC8lNsvZU">there</a>. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don’t have those trained hands?</p>
+
+<p>Scratch comes to the rescue.</p>
+
+<p>Here we combine the quick prototype capabilities of Arduino and rich interactive libraries of Scratch to make the musics a bit more colourful.</p>
+
+<h1 id="system-architecture">System Architecture</h1>
+
+<p><img src="/assets/Fruit Piano Arch.svg" alt="image" /></p>
+
+<p>The system is quite similar to the one with Firmata in my another <a href="http://rexpie.github.io/2015/08/23/extending-scratch.html">article</a>, except that it does not use Firmata. Extending firmata is of course a choice, however a quite expensive one.</p>
+
+<p>In this system, Arduino reports the status of each pin to the Helper App, which bundles the results and send over to Scratch. Scratch listens for changes in the pin values and triggers a sound accordingly when the threshold is exceeded.</p>
+
+<h2 id="reading-the-input-capacitance-from-digital-pin">Reading the input capacitance from digital pin</h2>
+
+<p>This is essentially witchcraft. You can refer to <a href="http://playground.arduino.cc/Code/CapacitiveSensor">this post</a>. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don’t want to waste food just for testing.</p>
+
+<h2 id="channel-between-scratch-and-arduino">Channel Between Scratch and Arduino</h2>
+
+<h3 id="arduino-code">Arduino Code</h3>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// setup Serial port baud rate
+</span>  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">115200</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="c1">// scan every digital pin
+</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+  
+    <span class="cm">/* Prints out:
+    * 2 2
+    * 3 2
+    * etc.*/</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">" "</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">readCapacitivePin</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+
+    <span class="c1">// no delay causes printing garbage
+</span>    <span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>This code just loops over each pin and report their capacitance readings to the serial port.</p>
+
+<h3 id="helper-app-code">Helper App Code</h3>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+<span class="c1">// holding the values of each port in a map, updated continuously</span>
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span>
+
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Arduino COM ports usually have the manufacturer name start with "Arduino"</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">"arduino"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
+
+            <span class="kd">var</span> <span class="nx">sp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">serialPort</span><span class="p">.</span><span class="nx">SerialPort</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="p">{</span>
+                <span class="na">baudrate</span><span class="p">:</span> <span class="mi">115200</span> <span class="c1">// must match the baud rate in the Arduino sketch code</span>
+            <span class="p">});</span>
+
+            <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"open"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">line</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+                    <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">"\n"</span><span class="p">);</span> <span class="c1">// split line breaks</span>
+                    <span class="kd">var</span> <span class="nx">columns</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">);</span> <span class="c1">// split pin and reading</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">columns</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// get rid of bad format</span>
+                        <span class="kd">var</span> <span class="nx">pin</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                        <span class="kd">var</span> <span class="nx">reading</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                        <span class="nx">reading</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">(\r\n</span><span class="sr">|</span><span class="se">\n</span><span class="sr">|</span><span class="se">\r)</span><span class="sr">/gm</span><span class="p">,</span> <span class="s2">""</span><span class="p">);</span>
+                        <span class="nx">fruits</span><span class="p">[</span><span class="nx">pin</span><span class="p">]</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">fruits</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+    <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="c1">// global http server</span>
+<span class="kd">var</span> <span class="nx">server</span><span class="p">;</span>
+<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// start recording request entry time</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="s1">'/poll'</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// not poll</span>
+        <span class="c1">// print non-polling command sent by Scratch		</span>
+
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// Polling</span>
+
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">fruits</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">pinName</span><span class="p">)</span> <span class="p">{</span>
+        	<span class="c1">// prints "capacity/13 2\n", for instance</span>
+            <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"capacity/"</span> <span class="o">+</span> <span class="nx">pinName</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinName</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"\n"</span><span class="p">);</span>
+        <span class="p">});</span>
+
+    <span class="p">}</span> <span class="c1">// end if</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span> <span class="c1">// HTTP port to listen to</span></code></pre></figure>
+
+<p>This runs on nodejs. You must have the <a href="https://www.npmjs.com/package/serialport">serialport</a> package installed.</p>
+
+<h3 id="scratch-extension-file">Scratch Extension File</h3>
+
+<p>You also need to define your own extension so Scratch can get data from your Helper App.</p>
+
+<p>Write up a text file and call it Fruits.s2e, with below content:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>	<span class="s2">"extensionName"</span><span class="err">:</span> <span class="s2">"DFRobot"</span><span class="p">,</span>
+	<span class="s2">"extensionPort"</span><span class="err">:</span> <span class="mi">23456</span><span class="p">,</span>
+	<span class="s2">"blockSpecs"</span><span class="err">:</span> <span class="p">[</span>
+		<span class="p">[</span><span class="s2">"r"</span><span class="p">,</span> <span class="s2">"Fruit reading at pin %n"</span><span class="p">,</span><span class="s2">"capacity"</span><span class="p">,</span> <span class="s2">"13"</span><span class="p">]</span>
+	<span class="p">]</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>the “r” means it is an input block. The “capacity” here is the reading variable identifier and must match the format we send from Nodejs server.</p>
+
+<h3 id="setting-up-the-scratch-project">Setting up the Scratch Project</h3>
+
+<p>The Chinese is just the translation of “Fruit reading at Pin”. I would advise against printing this on your T-shirt.</p>
+
+<p><img src="/assets/Fruit Scratch.png" alt="image" /></p>
+
+<p>As you can see you can make Scratch to play any sound you like. This example just uses built-in piano tones. You can customise Scratch to play any sound of your choice.</p>
+
+<p>The reason for so many separate blocks is to enable chord, that is touching two pieces of fruit at the same time and play two distinctive notes simultaneously.</p>
+
+<p>Note that attaching fruit to the wires will increase the readings for the capacitance. If your fruit is large, remember to raise the threashold. Here I use 5 because wet paper tissues usually get a reading of 3.</p>
+
+<p>Also don’t let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.</p>
+
+<h1 id="demo">Demo</h1>
+
+<p><img src="/assets/fruit.jpg" alt="image" /></p>
