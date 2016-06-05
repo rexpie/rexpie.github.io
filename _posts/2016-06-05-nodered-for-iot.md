@@ -39,7 +39,7 @@ As soon as you get past the first blinking example, you can start to go to the I
 
 Here is the simple flow setup.
 
-![image]({{ site.url }}/assets/node-red.png )
+![image]({{ site.url }}/assets/node-red_flow.png )
 
 ### Configure Email Node
 
