@@ -72,82 +72,76 @@
   </header>
 
   <article class="post-content">
-    <h2>Adding an extension to Ardublock</h2>
+    <h2 id="adding-an-extension-to-ardublock">Adding an extension to Ardublock</h2>
 
 <p>Extended From: <a href="http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/">How to hack ardublock</a></p>
 
-<h3>Handling the dependencies</h3>
+<h3 id="handling-the-dependencies">Handling the dependencies</h3>
 
 <ol>
-<li>Fork and clone Arduino form github</li>
-<li>Import openblocks and Ardublock into eclipse</li>
-<li>Import arduino-builder,arduino-dore and processing from Arduino project into eclipse</li>
-<li>Modify the buildpath of Ardublock and add the above 3 projects as dependency. Add openblocks and an dependency as well.</li>
-<li>Modify pom.xml in Ardublock，delete openblocks and Arduino dependency entries(They became obsolete over time and was no longer maintained)</li>
-<li>Continue to delete the install-arduino-pde execution entry in pom.xml</li>
+  <li>Fork and clone Arduino form github</li>
+  <li>Import openblocks and Ardublock into eclipse</li>
+  <li>Import arduino-builder,arduino-dore and processing from Arduino project into eclipse</li>
+  <li>Modify the buildpath of Ardublock and add the above 3 projects as dependency. Add openblocks and an dependency as well.</li>
+  <li>Modify pom.xml in Ardublock，delete openblocks and Arduino dependency entries(They became obsolete over time and was no longer maintained)</li>
+  <li>Continue to delete the install-arduino-pde execution entry in pom.xml</li>
 </ol>
-
 
 <p>You should now see no compiling errors within the projects. You may have a few warnings about the java compiler version. Just change the compilation configs to make eclipse happy.</p>
 
 <p>**If you are using other IDEs like IntelliJ, please use your own judgement to appropriately adapt the steps.</p>
 
-<h3>Adding an LED module</h3>
+<h3 id="adding-an-led-module">Adding an LED module</h3>
 
 <p>You can use the Ardublock article to do the same, here are some basic ideas:</p>
 
 <ol>
-<li>Add one BlockGenus with your own parameters</li>
-<li>Register the BlockGenus into one BlockDrawer so that you'll see the newly added module in the GUI, inside the designated drawer menu.</li>
-<li>If you need new image, tag or other custom resources to go with the new module, you need to add them to the resources folder, with i18n entries. Modify the <code>ardublock&lt;_{country_code}&gt;.properties</code> i18n file to achieve that.</li>
-<li>Modify block-mapping.properties and point the module to use the corresponding <code>Translator</code> Java class. You need to extend the <code>Translator</code> class if you want to dive in deeper.</li>
+  <li>Add one BlockGenus with your own parameters</li>
+  <li>Register the BlockGenus into one BlockDrawer so that you’ll see the newly added module in the GUI, inside the designated drawer menu.</li>
+  <li>If you need new image, tag or other custom resources to go with the new module, you need to add them to the resources folder, with i18n entries. Modify the <code>ardublock&lt;_{country_code}&gt;.properties</code> i18n file to achieve that.</li>
+  <li>Modify block-mapping.properties and point the module to use the corresponding <code>Translator</code> Java class. You need to extend the <code>Translator</code> class if you want to dive in deeper.</li>
 </ol>
 
-
-<h3>Export and install</h3>
+<h3 id="export-and-install">Export and install</h3>
 
 <ol>
-<li>Right click Ardublock and Openblocks projects and export a jar package</li>
-<li>You need to check the <code>export with all resources</code> checkbox to include the image and configuration files.</li>
-<li>Put your jar into the Arduino tools folder. Be careful with the folder names as one of them is said to be case sensitive. See the <a href="http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/">official tutorial</a> for sure.</li>
+  <li>Right click Ardublock and Openblocks projects and export a jar package</li>
+  <li>You need to check the <code>export with all resources</code> checkbox to include the image and configuration files.</li>
+  <li>Put your jar into the Arduino tools folder. Be careful with the folder names as one of them is said to be case sensitive. See the <a href="http://blog.ardublock.com/2012/05/04/how-to-hack-ardublock/">official tutorial</a> for sure.</li>
 </ol>
 
-
-<h3>Test</h3>
+<h3 id="test">Test</h3>
 
 <ol>
-<li>Open the Arduino installation folder</li>
-<li>Run Arduino-debug and you can see the logs in the console window.</li>
-<li>Click on <code>Tools</code>-><code>Ardublock</code></li>
-<li>Drag your new module and test the functions.</li>
+  <li>Open the Arduino installation folder</li>
+  <li>Run Arduino-debug and you can see the logs in the console window.</li>
+  <li>Click on <code>Tools</code>-&gt;<code>Ardublock</code></li>
+  <li>Drag your new module and test the functions.</li>
 </ol>
 
-
-<h2>Adding an I2C module</h2>
+<h2 id="adding-an-i2c-module">Adding an I2C module</h2>
 
 <p><strong><em>You need to know how to add your custom header file and c++ file</em></strong></p>
 
 <p>If you want to use I2C modules like an I2C mounted 1602 LCD, you need to add the I2C c++ libraries for easier coding. The original Ardublock can only generate a single ino file. Here is how:</p>
 
 <ol>
-<li>First you create your new module, of course. See steps above. Let's call the new module I2C.</li>
-<li>Modify the <code>Translator</code> base class and add a <code>customHeaderFileSet</code> private member, maybe next to its own <code>headerFileSet</code> member.</li>
-<li>Add a <code>addCustomHeaderFile</code> API for clients and derived classes to manipulate the <code>customHeaderFileSet</code></li>
-<li>Modify your I2C module and call your API to add the custom header and/or c++ file.</li>
+  <li>First you create your new module, of course. See steps above. Let’s call the new module I2C.</li>
+  <li>Modify the <code>Translator</code> base class and add a <code>customHeaderFileSet</code> private member, maybe next to its own <code>headerFileSet</code> member.</li>
+  <li>Add a <code>addCustomHeaderFile</code> API for clients and derived classes to manipulate the <code>customHeaderFileSet</code></li>
+  <li>Modify your I2C module and call your API to add the custom header and/or c++ file.</li>
 </ol>
 
-
-<p><figure class="highlight"><pre><code class="language-java" data-lang="java">    <span class="n">translator</span><span class="o">.</span><span class="na">addCustomHeaderFile</span><span class="o">(</span><span class="s">"LiquidCrystal_I2C.h"</span><span class="o">);</span></code></pre></figure></p>
+<figure class="highlight"><pre><code class="language-java" data-lang="java">	<span class="n">translator</span><span class="o">.</span><span class="na">addCustomHeaderFile</span><span class="o">(</span><span class="s">"LiquidCrystal_I2C.h"</span><span class="o">);</span></code></pre></figure>
 
 <ol>
-<li>Import your header files and cpp file to eclipse. You should keep them well in your classpath.</li>
-<li>Next you need to use file manipulation to read from your jar file, and write the file stream into the Aruino temp project location. You don't want to write to the destination, since they would clobber the source file to import.</li>
-<li>Find the Aruino <code>Editor</code> instance along the <code>Context</code> instance and open your temp header and/or c++ file.</li>
-<li>Set the editor to the ino file, or else your translated text will be writing to the last file you opened by default.</li>
+  <li>Import your header files and cpp file to eclipse. You should keep them well in your classpath.</li>
+  <li>Next you need to use file manipulation to read from your jar file, and write the file stream into the Aruino temp project location. You don’t want to write to the destination, since they would clobber the source file to import.</li>
+  <li>Find the Aruino <code>Editor</code> instance along the <code>Context</code> instance and open your temp header and/or c++ file.</li>
+  <li>Set the editor to the ino file, or else your translated text will be writing to the last file you opened by default.</li>
 </ol>
 
-
-<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Sketch</span> <span class="n">sketch</span> <span class="o">=</span> <span class="n">Context</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getEditor</span><span class="o">().</span><span class="na">getSketch</span><span class="o">();</span>
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Sketch</span> <span class="n">sketch</span> <span class="o">=</span> <span class="n">Context</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getEditor</span><span class="o">().</span><span class="na">getSketch</span><span class="o">();</span>
 <span class="n">File</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">sketch</span><span class="o">.</span><span class="na">getFolder</span><span class="o">().</span><span class="na">getParentFile</span><span class="o">();</span>
 <span class="n">File</span> <span class="n">header</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">folder</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">()</span> <span class="o">+</span> <span class="n">File</span><span class="o">.</span><span class="na">separator</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">);</span>
 <span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">getClass</span><span class="o">().</span><span class="na">getResource</span><span class="o">(</span><span class="s">"/com/ardublock/translator/block/dfrobot/"</span> <span class="o">+</span> <span class="n">fileName</span><span class="o">).</span><span class="na">openStream</span><span class="o">();</span>
@@ -155,15 +149,16 @@
 <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4096</span><span class="o">];</span>
 <span class="kt">int</span> <span class="n">bytesRead</span><span class="o">;</span>
 <span class="k">while</span> <span class="o">((</span><span class="n">bytesRead</span> <span class="o">=</span> <span class="n">is</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">bytesRead</span><span class="o">);</span>
+	<span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">bytesRead</span><span class="o">);</span>
 <span class="o">}</span>
 <span class="n">is</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-<span class="n">os</span><span class="o">.</span><span class="na">close</span><span class="o">();</span></code></pre></figure></p>
+<span class="n">os</span><span class="o">.</span><span class="na">close</span><span class="o">();</span></code></pre></figure>
 
-<h2>Conclusion</h2>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>You can easily add new module for <strong>simple input and output</strong>.
 You have to drill down to the <code>Translator</code> core for advanced code generation, but it is not a very difficult task because the source code is quite well orgnized. Thumbs up to the <a href="http://blog.ardublock.com">Arublock</a> team.</p>
+
 
   </article>
 

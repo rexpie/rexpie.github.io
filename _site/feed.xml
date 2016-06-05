@@ -6,54 +6,173 @@
 </description>
     <link>http://rexpie.github.io/</link>
     <atom:link href="http://rexpie.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 01 Feb 2016 12:25:37 +0800</pubDate>
-    <lastBuildDate>Mon, 01 Feb 2016 12:25:37 +0800</lastBuildDate>
+    <pubDate>Sun, 05 Jun 2016 23:43:45 +0800</pubDate>
+    <lastBuildDate>Sun, 05 Jun 2016 23:43:45 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title>Socket.io For Multiple User Game</title>
-        <description>&lt;h1&gt;There Will Be a Party&lt;/h1&gt;
+        <title>Controlling Arduino with Email</title>
+        <description>&lt;h1 id=&quot;controlling-arduino-with-email&quot;&gt;Controlling Arduino with Email&lt;/h1&gt;
 
+&lt;p&gt;Here I am taking the advantage of the Node-RED tool and the email service to build a simple but awesome IOT control unit.&lt;/p&gt;
+
+&lt;p&gt;You can remotely control your Arduino board by sending an email to your own account. The process roughly takes half an hour, with minimum coding required.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nodered.org&quot;&gt;Node-RED&lt;/a&gt; is a visual programming tool for Internet of Things.
+IBM is actively bringing its latest functions, including Waston and IOT service, into the toolbox ever since its acquisition.
+We are using Node-RED to demonstrate how to setup a simple connected IOT control hub.&lt;/p&gt;
+
+&lt;h1 id=&quot;system-environments&quot;&gt;System Environments&lt;/h1&gt;
+
+&lt;p&gt;Hardware list:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Mac OS 10.11.5&lt;/li&gt;
+  &lt;li&gt;Arduino Uno board of your choice, I am using one from &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=838&amp;amp;search=uno&amp;amp;description=true&quot;&gt;DFRobot&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;software-setup&quot;&gt;Software setup&lt;/h1&gt;
+
+&lt;h2 id=&quot;flash-firmata-into-your-uno-board&quot;&gt;Flash Firmata into Your Uno Board&lt;/h2&gt;
+
+&lt;p&gt;There is a nice &lt;a href=&quot;http://www.instructables.com/id/Arduino-Installing-Standard-Firmata/&quot;&gt;tutorial&lt;/a&gt; for you.&lt;/p&gt;
+
+&lt;h2 id=&quot;install-node-red&quot;&gt;Install Node-RED&lt;/h2&gt;
+
+&lt;p&gt;Please follow the &lt;a href=&quot;http://nodered.org/docs/hardware/arduino&quot;&gt;official Arduino documentation from Node-RED&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;As soon as you get past the first blinking example, you can start to go to the IOT part.&lt;/p&gt;
+
+&lt;h2 id=&quot;build-control-flow&quot;&gt;Build Control flow&lt;/h2&gt;
+
+&lt;p&gt;Here is the simple flow setup.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/node-red.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;configure-email-node&quot;&gt;Configure Email Node&lt;/h3&gt;
+
+&lt;p&gt;Now we can configure the email node. I am using the Microsoft office email server. If you are using other
+email service providers, please check your server settings for setting up an &lt;code&gt;imap&lt;/code&gt; client.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/node-red_email.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And also if you are using &lt;em&gt;Gmail&lt;/em&gt;, you need to create an application specific password for third-party application authentication.&lt;/p&gt;
+
+&lt;h3 id=&quot;configure-function-node&quot;&gt;Configure Function Node&lt;/h3&gt;
+
+&lt;p&gt;We need a tiny bit of code to interpret the email messages before relay that on to your Arduino board.&lt;/p&gt;
+
+&lt;p&gt;Specifically, we are using the email’s &lt;strong&gt;subject&lt;/strong&gt; to control our Arduino board. Because some server may automatically attach or transform the email &lt;strong&gt;body&lt;/strong&gt; content or format for better user experience (in its own opinion), it would be easier to write working code for our example using only the &lt;strong&gt;email subject&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here is the code&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;javascript
+    msg.payload = parseInt(msg.topic);  
+    return msg;
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/node-red_function.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;configure-the-arduino-led-node&quot;&gt;Configure the Arduino LED Node&lt;/h3&gt;
+
+&lt;p&gt;You should have configured the LED node on pin 13 already if you have passed the example. But here is a screenshot just in case.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/node-red_pin.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;test&quot;&gt;Test&lt;/h1&gt;
+
+&lt;p&gt;Now you can send an email to your account, with the subject of a single digit: 1( or 0 if your pin 13 LED is already turned on). You should see the LED on the board change after about 10 or 20 seconds after you have sent the email.&lt;/p&gt;
+
+&lt;p&gt;You can leave the email body empty, we are not going to use that part for now. However you can choose to try more tricks with the email body once you feel more confident.&lt;/p&gt;
+
+&lt;h1 id=&quot;how-it-works&quot;&gt;How It Works&lt;/h1&gt;
+
+&lt;p&gt;According to Node-RED documentation, the email node will try to get your latest email from the given mail folder between the given time interval. It will notice any new email, and pass on email information to our logical function. Then our function tries to interpret the subject to an integer and fill in the data our Arduino output pin needs. Finally the Arduino pin node controls the board using firmata protocol and changes the LED status.&lt;/p&gt;
+
+&lt;p&gt;I really wish you had fun using Node-RED and Arduino. Firmata is a great way to communicate with the board, and Node-RED surely is a fast way to build IOT control layer. Plus you don’t have to pay for email service these days, so you don’t even need to buy public domain IP address to remotely control your board across different network domains. All you need is something that runs nodejs with a serial port. On that part I would recommend either the &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/search&amp;amp;description=true&amp;amp;search=berry&quot;&gt;Raspberry Pi&lt;/a&gt; or the &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=1405&amp;amp;search=lattepanda&amp;amp;description=true#.V1RIHVd7zCc&quot;&gt;LattePanda&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 05 Jun 2016 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2016/06/05/nodered-for-iot.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2016/06/05/nodered-for-iot.html</guid>
+        
+        <category>Arduino</category>
+        
+        <category>Node-RED</category>
+        
+        <category>IOT</category>
+        
+        <category>firmata</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Plotting Data From Arduino</title>
+        <description>&lt;h1 id=&quot;plotting-data-from-arduino&quot;&gt;Plotting Data from Arduino&lt;/h1&gt;
+
+&lt;p&gt;Debugging Arduino code is hard without support like J-tag. Most of the time we rely on serial logs.
+Since Arduino applications are loops in nature, the data naturally manifest itself with time-series properties.
+Charting and plotting data from Arduino would make a lot of debugging easier, compared to looking at the raw data from the serial monitor window.&lt;/p&gt;
+
+&lt;p&gt;So I made a tool for plotting data from the serial port.&lt;/p&gt;
+
+&lt;p&gt;All of the tools and libs are ready-made, connecting the dots was great fun.&lt;/p&gt;
+
+&lt;p&gt;https://github.com/DFRobot/DFSerialChart&lt;/p&gt;
+</description>
+        <pubDate>Sun, 10 Apr 2016 00:00:00 +0800</pubDate>
+        <link>http://rexpie.github.io/2016/04/10/plotting-arduino.html</link>
+        <guid isPermaLink="true">http://rexpie.github.io/2016/04/10/plotting-arduino.html</guid>
+        
+        <category>Arduino</category>
+        
+        <category>serial</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Socket.io For Multiple User Game</title>
+        <description>&lt;h1 id=&quot;there-will-be-a-party&quot;&gt;There Will Be a Party&lt;/h1&gt;
 &lt;p&gt;So everyone was assigned to come up with a party game. My first few ideas sucked. Then I tried to move on to something geeky and came across the idea of multiple user games.&lt;/p&gt;
 
 &lt;p&gt;I need to build a simple game, real time that supports multiple players and in a non-compete but hard to cooperate way.&lt;/p&gt;
 
-&lt;h1&gt;The Maze&lt;/h1&gt;
-
-&lt;p&gt;Let&#39;s get through the maze together, like, 100 of us. Seems easy enough for one patient player, but could have unexpected results for a group of people. It will suddenly becomes hard when players try to make a narrow turn.&lt;/p&gt;
+&lt;h1 id=&quot;the-maze&quot;&gt;The Maze&lt;/h1&gt;
+&lt;p&gt;Let’s get through the maze together, like, 100 of us. Seems easy enough for one patient player, but could have unexpected results for a group of people. It will suddenly becomes hard when players try to make a narrow turn.&lt;/p&gt;
 
 &lt;p&gt;First, start with a maze. Just grab one &lt;a href=&quot;http://www.codeproject.com/Articles/577080/Create-an-HTML5-and-JavaScript-Maze-Game-with-a-timer&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;The tricky part is setup the multiple user control. We need to have something fast, lightweight, and easy to write, born async and browser-based.&lt;/p&gt;
 
-&lt;h1&gt;The Control&lt;/h1&gt;
-
+&lt;h1 id=&quot;the-control&quot;&gt;The Control&lt;/h1&gt;
 &lt;p&gt;In comes socket.io. There is a collaborative canvas in their official documents. But actually the simplest example would be helpful enough. I did not use the &lt;code&gt;Express&lt;/code&gt; framework because it is a single page game app.&lt;/p&gt;
 
-&lt;h2&gt;Client side - control pad&lt;/h2&gt;
+&lt;h2 id=&quot;client-side---control-pad&quot;&gt;Client side - control pad&lt;/h2&gt;
 
-&lt;pre&gt;&lt;code class=&quot;HTML&quot;&gt;    &amp;lt;script src=&quot;https://cdn.socket.io/socket.io-1.4.4.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;p&gt;```HTML
+    &lt;script src=&quot;https://cdn.socket.io/socket.io-1.4.4.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
 
-    &amp;lt;script&amp;gt;
-        var socket;
-        socket = io(&#39;http://127.0.0.1:8888&#39;);
-    &amp;lt;/script&amp;gt;
-    &amp;lt;div class=&quot;table-cell&quot; ontouchstart=&quot;socket.emit(&#39;command&#39;,{control:38})&quot;&amp;gt;
-        &amp;lt;img class=&quot;rs rotate270&quot; src=&quot;arrow.png&quot; /&amp;gt;
-    &amp;lt;/div&amp;gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;script&amp;gt;
+    var socket;
+    socket = io(&#39;http://127.0.0.1:8888&#39;);
+&amp;lt;/script&amp;gt;
+&amp;lt;div class=&quot;table-cell&quot; ontouchstart=&quot;socket.emit(&#39;command&#39;,{control:38})&quot;&amp;gt;
+    &amp;lt;img class=&quot;rs rotate270&quot; src=&quot;arrow.png&quot; /&amp;gt;
+&amp;lt;/div&amp;gt;
 
-    &amp;lt;style&amp;gt;
-    .rotate90 {
-        -ms-transform: rotate(90deg);
-        /* IE 9 */
-        -webkit-transform: rotate(90deg);
-        /* Chrome, Safari, Opera */
-        transform: rotate(90deg);
-    }
-    &amp;lt;/style&amp;gt;
+&amp;lt;style&amp;gt;
+.rotate90 {
+    -ms-transform: rotate(90deg);
+    /* IE 9 */
+    -webkit-transform: rotate(90deg);
+    /* Chrome, Safari, Opera */
+    transform: rotate(90deg);
+}
+&amp;lt;/style&amp;gt; ```
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Notice I used &lt;code&gt;ontouchstart&lt;/code&gt; event listener. That&#39;s because this game is for mobile
+&lt;p&gt;Notice I used &lt;code&gt;ontouchstart&lt;/code&gt; event listener. That’s because this game is for mobile
 devices. On iOS devices there would be a 300ms delay if you want to trigger an &lt;code&gt;onclick&lt;/code&gt;
 event, which makes this app appear to be slow. But it is not the socket.io part that
 slows down the reaction feedback loop, rather the built-in browser.&lt;/p&gt;
@@ -61,60 +180,61 @@ slows down the reaction feedback loop, rather the built-in browser.&lt;/p&gt;
 &lt;p&gt;This is only one button setup. You need to add other three buttons in your preferred
 layout and style. Add in the event listeners and you are all set.&lt;/p&gt;
 
-&lt;h2&gt;Client side - maze app&lt;/h2&gt;
-
+&lt;h2 id=&quot;client-side---maze-app&quot;&gt;Client side - maze app&lt;/h2&gt;
 &lt;p&gt;You still need to write the script tag to import socket.io library.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;    var socket = io.connect(&#39;http://127.0.0.1:8888&#39;);
+&lt;p&gt;```javascript
+    var socket = io.connect(‘http://127.0.0.1:8888’);&lt;/p&gt;
 
-    socket.on(&#39;control&#39;, function(data) {
-      console.log(data);
-      var e = {
-        keyCode: data.control
-      };
-      moveRect(e);
-    });
+&lt;pre&gt;&lt;code&gt;socket.on(&#39;control&#39;, function(data) {
+  console.log(data);
+  var e = {
+    keyCode: data.control
+  };
+  moveRect(e);
+}); ```
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2&gt;Server side - messaging&lt;/h2&gt;
+&lt;h2 id=&quot;server-side---messaging&quot;&gt;Server side - messaging&lt;/h2&gt;
 
-&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;    var app = require(&#39;http&#39;).createServer(handler);
-    var io = require(&#39;socket.io&#39;)(app);
-    var fs = require(&#39;fs&#39;);
+&lt;p&gt;```javascript
+    var app = require(‘http’).createServer(handler);
+    var io = require(‘socket.io’)(app);
+    var fs = require(‘fs’);&lt;/p&gt;
 
-    app.listen(8888);
+&lt;pre&gt;&lt;code&gt;app.listen(8888);
 
-    function handler(req, res) {
-      fs.readFile(__dirname + req.url,
-        function(err, data) {
-          if (err) {
-            res.writeHead(500);
-            return res.end(&#39;Error loading:&#39; + req.url);
-          }
+function handler(req, res) {
+  fs.readFile(__dirname + req.url,
+    function(err, data) {
+      if (err) {
+        res.writeHead(500);
+        return res.end(&#39;Error loading:&#39; + req.url);
+      }
 
-          res.writeHead(200);
-          res.end(data);
-        });
-    }
-
-    io.on(&#39;connection&#39;, function(socket) {
-      socket.on(&#39;command&#39;, function(data) {
-        console.log(data);
-        // *important*: io.emit is global emit
-        // If we use `socket.emit` here, the socket we use would be the same
-        // socket we are receiving data, which is on the controller pad webpage.
-        // That means the maze game app is not getting the data it needs.
-        // We need to send the control message by broadcasting to the maze game app.
-        io.emit(&#39;control&#39;, data);
-      });
+      res.writeHead(200);
+      res.end(data);
     });
+}
+
+io.on(&#39;connection&#39;, function(socket) {
+  socket.on(&#39;command&#39;, function(data) {
+    console.log(data);
+    // *important*: io.emit is global emit
+    // If we use `socket.emit` here, the socket we use would be the same
+    // socket we are receiving data, which is on the controller pad webpage.
+    // That means the maze game app is not getting the data it needs.
+    // We need to send the control message by broadcasting to the maze game app.
+    io.emit(&#39;control&#39;, data);
+  });
+}); ```
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;It is worth mentioning that you need to separate the two channels, one from game pad
 to the server and the other one from server to the maze app.&lt;/p&gt;
 
 &lt;p&gt;You can use two event names, or you can put them in different socket namespaces.
-Either way you don&#39;t want inadvertent infinite message loop.&lt;/p&gt;
+Either way you don’t want inadvertent infinite message loop.&lt;/p&gt;
 </description>
         <pubDate>Thu, 14 Jan 2016 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2016/01/14/socketio.html</link>
@@ -129,26 +249,26 @@ Either way you don&#39;t want inadvertent infinite message loop.&lt;/p&gt;
     
       <item>
         <title>Blockly Multitouch Bug Fix</title>
-        <description>&lt;h1&gt;The Bug&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;the-bug&quot;&gt;The Bug&lt;/h1&gt;
 
 &lt;p&gt;I am building a mobile visual programming app for &lt;a href=&quot;http://www.dfrobot.com/index.php?route=product/product&amp;amp;product_id=1044#.UoyIUpH7k8M&quot;&gt;Bluno&lt;/a&gt; and its compatible devices.
 Long story short, there is a bug on both IOS and Android that convinces me that Blockly is not doing things right.&lt;/p&gt;
 
-&lt;p&gt;When I swipe my fingers across Blockly workspace, sometimes the rest of the HTML page stops responding to taps or swipes. At first I thought it was issue of event binding of &lt;code&gt;touchStart&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt;. I changed all my &lt;code&gt;onClick&lt;/code&gt; attributes to &lt;code&gt;Blockly.bindEvent_&lt;/code&gt; calls. It worked for some time until I can&#39;t scroll the Arduino code text view.&lt;/p&gt;
+&lt;p&gt;When I swipe my fingers across Blockly workspace, sometimes the rest of the HTML page stops responding to taps or swipes. At first I thought it was issue of event binding of &lt;code&gt;touchStart&lt;/code&gt; and &lt;code&gt;mouseDown&lt;/code&gt;. I changed all my &lt;code&gt;onClick&lt;/code&gt; attributes to &lt;code&gt;Blockly.bindEvent_&lt;/code&gt; calls. It worked for some time until I can’t scroll the Arduino code text view.&lt;/p&gt;
 
 &lt;p&gt;I spent two days debugging and found the bug.&lt;/p&gt;
 
-&lt;h2&gt;The fix&lt;/h2&gt;
-
+&lt;h2 id=&quot;the-fix&quot;&gt;The fix&lt;/h2&gt;
 &lt;p&gt;On a touch device with multitouch support, multiple &lt;code&gt;touchStart&lt;/code&gt; events can be fired together. This causes multiple calls to &lt;code&gt;Blockly.WorkspaceSvg.prototype.onMouseDown_&lt;/code&gt; event handler.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;    if (&#39;mouseup&#39; in Blockly.bindEvent_.TOUCH_MAP) {
+&lt;p&gt;&lt;code&gt;
+    if (&#39;mouseup&#39; in Blockly.bindEvent_.TOUCH_MAP) {
       Blockly.onTouchUpWrapper_ =
           Blockly.bindEvent_(document, &#39;mouseup&#39;, null, Blockly.onMouseUp_);
     }
     Blockly.onMouseMoveWrapper_ =
         Blockly.bindEvent_(document, &#39;mousemove&#39;, null, Blockly.onMouseMove_);
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;This code binds multiple events to the document element but only the last call actually registers the event handler wrapper, which will consequently be called in the global &lt;code&gt;Blockly.onMouseUp_&lt;/code&gt; handler.&lt;/p&gt;
 
@@ -169,33 +289,34 @@ Long story short, there is a bug on both IOS and Android that convinces me that 
     
       <item>
         <title>Localizing Blockly</title>
-        <description>&lt;h1&gt;Localizing Blockly within WKwebView&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;localizing-blockly-within-wkwebview&quot;&gt;Localizing Blockly within WKwebView&lt;/h1&gt;
 
-&lt;h2&gt;Add translation for Blockly&lt;/h2&gt;
-
-&lt;p&gt;Setup the block declaration code using Blockly.Msg.&lt;LOCALIZED_STRING&gt; and prepare
+&lt;h2 id=&quot;add-translation-for-blockly&quot;&gt;Add translation for Blockly&lt;/h2&gt;
+&lt;p&gt;Setup the block declaration code using Blockly.Msg.&lt;localized_string&gt; and prepare
 the language files under msg/json folder. When you compile blockly they will get
-compiled as well.&lt;/p&gt;
+compiled as well.&lt;/localized_string&gt;&lt;/p&gt;
 
-&lt;h2&gt;Import translation file in WKwebView&lt;/h2&gt;
-
-&lt;p&gt;Now import that compiled language file. Of course we don&#39;t want to hard-code so
+&lt;h2 id=&quot;import-translation-file-in-wkwebview&quot;&gt;Import translation file in WKwebView&lt;/h2&gt;
+&lt;p&gt;Now import that compiled language file. Of course we don’t want to hard-code so
 we setup the language in the localizable strings file:&lt;/p&gt;
 
 &lt;p&gt;In localizable.strings(Base):&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;  &quot;language&quot; = &quot;en&quot;;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;
+  &quot;language&quot; = &quot;en&quot;;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;In localizable.strings(Simplified Chinese):&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;  &quot;language&quot; = &quot;zh-hans&quot;;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;
+  &quot;language&quot; = &quot;zh-hans&quot;;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Then we can load the language property into the user script. Note we put this code
 at the &lt;em&gt;End&lt;/em&gt; of the document so it overrides default language source.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;  let language = NSLocalizedString(&quot;language&quot;, comment:&quot;&quot;)
+&lt;p&gt;&lt;code&gt;
+  let language = NSLocalizedString(&quot;language&quot;, comment:&quot;&quot;)
   if let languageJSPath = NSBundle.mainBundle().pathForResource(language, ofType: &quot;js&quot;, inDirectory: &quot;blockly/msg/js&quot;) {
     do {
         let languageJS = try NSString(contentsOfFile: languageJSPath, encoding: NSUTF8StringEncoding) as String
@@ -205,16 +326,16 @@ at the &lt;em&gt;End&lt;/em&gt; of the document so it overrides default language
         print(&quot;Cannot load lang file&quot;)
     }
   }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;h2&gt;Localizing HTML&lt;/h2&gt;
+&lt;h2 id=&quot;localizing-html&quot;&gt;Localizing HTML&lt;/h2&gt;
 
 &lt;p&gt;Next we should localize HTML elements.&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.localeplanet.com/support/howto-localize-js.html&quot;&gt;This article&lt;/a&gt; is
 good practice for JS based dynamic localization. I followed it with a few tweaks.&lt;/p&gt;
 
-&lt;h3&gt;Localizing Blockly Toolbox&lt;/h3&gt;
+&lt;h3 id=&quot;localizing-blockly-toolbox&quot;&gt;Localizing Blockly Toolbox&lt;/h3&gt;
 
 &lt;p&gt;Blockly Toolbox is defined in the HTML page using XML element. Then &lt;code&gt;toolbox.js&lt;/code&gt; waltzes
 in and dynamically creates a virtual dom. So we should go into the code and intercept
@@ -223,69 +344,70 @@ in and dynamically creates a virtual dom. So we should go into the code and inte
 &lt;p&gt;In &lt;code&gt;toolbox.js&lt;/code&gt;, in function &lt;code&gt;Blockly.Toolbox.prototype.populate_&lt;/code&gt;, make the
 following change:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt; var childOut = rootOut.createNode(_(childIn.getAttribute(&#39;name&#39;)));
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;
+ var childOut = rootOut.createNode(_(childIn.getAttribute(&#39;name&#39;)));
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Then use these regex on your HTML to mark the strings:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;find regex:   category name=&quot;([^&quot;]*)&quot;
+&lt;p&gt;&lt;code&gt;
+find regex:   category name=&quot;([^&quot;]*)&quot;
 replace with: category name=&quot;_(&#39;$1&#39;)&quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Then use gettext to generate the &lt;code&gt;po&lt;/code&gt; file:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;xgettext.pl apps/blocklyduino/BigBee.html
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;
+xgettext.pl apps/blocklyduino/BigBee.html
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Use the tools of your choice to translate.&lt;/p&gt;
 
 &lt;p&gt;After that, you can generate the messages file using:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;po2js.py messages.po
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;
+po2js.py messages.po
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;This creates a messages.js file that you can directly embed in
 your HTML:&lt;/p&gt;
 
-&lt;p&gt;```&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;
+&amp;lt;script type=&quot;text/javascript&quot; src=&quot;../../translate_compressed.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type=&quot;text/javascript&quot; src=&quot;../../messages.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;script type=&quot;text/javascript&quot; src=&quot;../../translate_compressed.js&quot;&gt;&lt;/script&gt;
+&lt;p&gt;You may need to install the &lt;code&gt;polib&lt;/code&gt; for &lt;code&gt;python&lt;/code&gt;:&lt;/p&gt;
 
+&lt;p&gt;&lt;code&gt;
+pip install polib
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;script type=&quot;text/javascript&quot; src=&quot;../../messages.js&quot;&gt;&lt;/script&gt;
-
-
-&lt;pre&gt;&lt;code&gt;
-You may need to install the `polib` for `python`:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;pip install polib
-```&lt;/p&gt;
-
-&lt;p&gt;You might wonder,&lt;/p&gt;
-
-&lt;blockquote&gt;&lt;p&gt;But how do we dynamically choose which file should we use for
-translation?&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;You might wonder,
+&amp;gt; But how do we dynamically choose which file should we use for
+translation?&lt;/p&gt;
 
 &lt;p&gt;Luckly, WKwebView has the &lt;code&gt;navigation.language&lt;/code&gt; property that we
 can use. We can add this snippet to the translation file:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;var translate = function(text) {
+&lt;p&gt;&lt;code&gt;
+var translate = function(text) {
   if (!navigator.language || navigator.language === &quot;en-us&quot;) {
     return text;
   }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;As for the other elements in the HTML file, we can use this
 pattern:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;var buttons = [&#39;btnUpload&#39;, &#39;btnLoadExample&#39;, &#39;btnDiscard&#39;];
+&lt;p&gt;&lt;code&gt;
+var buttons = [&#39;btnUpload&#39;, &#39;btnLoadExample&#39;, &#39;btnDiscard&#39;];
 buttons.map(function(buttonId){
   document.getElementById(buttonId).innerHTML = _(document.getElementById(buttonId).innerHTML);
 });
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;h3&gt;Optional&lt;/h3&gt;
+&lt;h3 id=&quot;optional&quot;&gt;Optional&lt;/h3&gt;
 
 &lt;p&gt;You can use
 &lt;a href=&quot;http://closure-compiler.appspot.com/home&quot;&gt;this link&lt;/a&gt; to compile/compress your js code.&lt;/p&gt;
@@ -303,25 +425,29 @@ buttons.map(function(buttonId){
     
       <item>
         <title>Hacking Blockly</title>
-        <description>&lt;h1&gt;Blockly Touch/Drag Events Tweaking&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;blockly-touchdrag-events-tweaking&quot;&gt;Blockly Touch/Drag Events Tweaking&lt;/h1&gt;
 
-&lt;h2&gt;The issue&lt;/h2&gt;
+&lt;h2 id=&quot;the-issue&quot;&gt;The issue&lt;/h2&gt;
 
-&lt;blockquote&gt;&lt;p&gt;TL,DR: I want to enable scrolling with dragging on the flyout menu.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;TL,DR: I want to enable scrolling with dragging on the flyout menu.&lt;/p&gt;
+&lt;/blockquote&gt;
 
-&lt;p&gt;I recently played with &lt;a href=&quot;https://github.com/BlocklyDuino/BlocklyDuino&quot;&gt;BlocklyDuino&lt;/a&gt; a bit, and it was fun. I even embedded it into IOS app, using WKWebview and some JS bridging delegate.&lt;br/&gt;
+&lt;p&gt;I recently played with &lt;a href=&quot;https://github.com/BlocklyDuino/BlocklyDuino&quot;&gt;BlocklyDuino&lt;/a&gt; a bit, and it was fun. I even embedded it into IOS app, using WKWebview and some JS bridging delegate.&lt;br /&gt;
 Only problem is when I added too many blocks into one toolbox category, I need to scroll down the flyout menu to find what I want. Now on touch devices, scrolling is fairly popular interaction and users have high expectations for that. But the blockly flyout is not doing what I expect. As soon as you touch one block, a new block is immediately created and the flyout menu closes. You can only scroll by dragging the scrollbar handle, or you touch empty spaces between or beside the blocks and drag the scroll panel. These spaces are very tight for smaller devices, making it hard to manipulate the menu.&lt;/p&gt;
 
-&lt;h2&gt;The culprit&lt;/h2&gt;
+&lt;h2 id=&quot;the-culprit&quot;&gt;The culprit&lt;/h2&gt;
 
 &lt;p&gt;After some code searching, the flyout.js file shows that the menu from toolbox has an &lt;code&gt;autoClose&lt;/code&gt; attribute. So first,&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;Blockly.Flyout.prototype.autoClose = false;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;javascript
+Blockly.Flyout.prototype.autoClose = false;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Then, we go to the place where new blocks are created, and change its behaviour:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;// only create a new block when dragging towards the right. Try to scroll up and down when dragging vertically.
+&lt;p&gt;&lt;code&gt;javascript
+// only create a new block when dragging towards the right. Try to scroll up and down when dragging vertically.
 if (Math.sqrt(dx * dx + dy * dy) &amp;gt; Blockly.DRAG_RADIUS &amp;amp;&amp;amp; dx &amp;gt; 2 * Math.abs(dy)) {
   // Create the block.
   Blockly.Flyout.startFlyout_.createBlockFunc_(Blockly.Flyout.startBlock_)(Blockly.Flyout.startDownEvent_);
@@ -334,16 +460,17 @@ if (Math.sqrt(dx * dx + dy * dy) &amp;gt; Blockly.DRAG_RADIUS &amp;amp;&amp;amp;
   Blockly.Flyout.startDownEvent_ = e;
   Blockly.Flyout.startFlyout_.scrollbar_.set(y);
 }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Also, we need to change the code where the flyout closes itself, this code is near the end of function &lt;code&gt;createBlockFunc_&lt;/code&gt;. The tricky part is that the flyout menu for the context menu is also using this bit of code.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;// Check if the flyout menu is popped out by toolbox or not. Do not hide the menu if context menu is calling this flyout.
+&lt;p&gt;&lt;code&gt;javascript
+// Check if the flyout menu is popped out by toolbox or not. Do not hide the menu if context menu is calling this flyout.
 if (workspace.toolbox_ &amp;amp;&amp;amp; workspace.toolbox_.tree_) {
   flyout.hide();
   workspace.toolbox_.clearSelection();
 }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;And we are all set. The menu is scrollable via dragging vertically on the blocks as well. When you drag a block to the right, a new block is created and the flyout menu also closes itself.&lt;/p&gt;
 </description>
@@ -362,144 +489,138 @@ if (workspace.toolbox_ &amp;amp;&amp;amp; workspace.toolbox_.tree_) {
     
       <item>
         <title>Fruit Piano with Arduino/Scratch</title>
-        <description>&lt;h1&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;fruit-piano-with-arduinoscratch&quot;&gt;Fruit Piano with Arduino/Scratch&lt;/h1&gt;
 
-&lt;p&gt;We have seen many interesting musical applications with Arduino &lt;a href=&quot;https://www.youtube.com/watch?v=jAVE6T7FqJs&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://www.youtube.com/watch?v=yRvC8lNsvZU&quot;&gt;there&lt;/a&gt;. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don&#39;t have those trained hands?&lt;/p&gt;
+&lt;p&gt;We have seen many interesting musical applications with Arduino &lt;a href=&quot;https://www.youtube.com/watch?v=jAVE6T7FqJs&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://www.youtube.com/watch?v=yRvC8lNsvZU&quot;&gt;there&lt;/a&gt;. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don’t have those trained hands?&lt;/p&gt;
 
 &lt;p&gt;Scratch comes to the rescue.&lt;/p&gt;
 
 &lt;p&gt;Here we combine the quick prototype capabilities of Arduino and rich interactive libraries of Scratch to make the musics a bit more colourful.&lt;/p&gt;
 
-&lt;h1&gt;System Architecture&lt;/h1&gt;
+&lt;h1 id=&quot;system-architecture&quot;&gt;System Architecture&lt;/h1&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit%20Piano%20Arch.svg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit Piano Arch.svg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The system is quite similar to the one with Firmata in my another &lt;a href=&quot;http://rexpie.github.io/2015/08/23/extending-scratch.html&quot;&gt;article&lt;/a&gt;, except that it does not use Firmata. Extending firmata is of course a choice, however a quite expensive one.&lt;/p&gt;
 
 &lt;p&gt;In this system, Arduino reports the status of each pin to the Helper App, which bundles the results and send over to Scratch. Scratch listens for changes in the pin values and triggers a sound accordingly when the threshold is exceeded.&lt;/p&gt;
 
-&lt;h2&gt;Reading the input capacitance from digital pin&lt;/h2&gt;
+&lt;h2 id=&quot;reading-the-input-capacitance-from-digital-pin&quot;&gt;Reading the input capacitance from digital pin&lt;/h2&gt;
 
-&lt;p&gt;This is essentially witchcraft. You can refer to &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don&#39;t want to waste food just for testing.&lt;/p&gt;
+&lt;p&gt;This is essentially witchcraft. You can refer to &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don’t want to waste food just for testing.&lt;/p&gt;
 
-&lt;h2&gt;Channel Between Scratch and Arduino&lt;/h2&gt;
+&lt;h2 id=&quot;channel-between-scratch-and-arduino&quot;&gt;Channel Between Scratch and Arduino&lt;/h2&gt;
 
-&lt;h3&gt;Arduino Code&lt;/h3&gt;
+&lt;h3 id=&quot;arduino-code&quot;&gt;Arduino Code&lt;/h3&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;c1&quot;&gt;// setup Serial port baud rate
 &lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;115200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 
-&lt;p&gt;  &lt;span class=&quot;c1&quot;&gt;// scan every digital pin
-&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;/p&gt;
+  &lt;span class=&quot;c1&quot;&gt;// scan every digital pin
+&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+  
+    &lt;span class=&quot;cm&quot;&gt;/* Prints out:
+    * 2 2
+    * 3 2
+    * etc.*/&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readCapacitivePin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Serial&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;cm&quot;&amp;gt;/* Prints out:
-* 2 2
-* 3 2
-* etc.*/&amp;lt;/span&amp;gt;
-&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;i&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;readCapacitivePin&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;i&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;));&amp;lt;/span&amp;gt;
-&amp;lt;span class=&quot;n&quot;&amp;gt;Serial&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;n&quot;&amp;gt;print&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s&quot;&amp;gt;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-
-&amp;lt;span class=&quot;c1&quot;&amp;gt;// no delay causes printing garbage
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// no delay causes printing garbage
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This code just loops over each pin and report their capacitance readings to the serial port.&lt;/p&gt;
 
-&lt;h3&gt;Helper App Code&lt;/h3&gt;
+&lt;h3 id=&quot;helper-app-code&quot;&gt;Helper App Code&lt;/h3&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// holding the values of each port in a map, updated continuously&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
+            &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;pre&gt;&lt;code&gt;        &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;new&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;serialPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;SerialPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;defaultPort&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-            &amp;lt;span class=&quot;na&quot;&amp;gt;baudrate&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;:&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;115200&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// must match the baud rate in the Arduino sketch code&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;SerialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;baudrate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;115200&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// must match the baud rate in the Arduino sketch code&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 
-        &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;on&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;open&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;()&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-            &amp;lt;span class=&quot;nx&quot;&amp;gt;sp&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;on&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;data&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;data&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;toString&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;lines&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;split&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// split line breaks&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;line&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;split&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// split pin and reading&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;length&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// get rid of bad format&amp;lt;/span&amp;gt;
-                    &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pin&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;0&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;];&amp;lt;/span&amp;gt;
-                    &amp;lt;span class=&quot;kd&quot;&amp;gt;var&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;columns&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;mi&quot;&amp;gt;1&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;];&amp;lt;/span&amp;gt;
-                    &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;replace&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;(\r\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;|&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\n&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;|&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;se&quot;&amp;gt;\r)&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;sr&quot;&amp;gt;/gm&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;,&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-                    &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pin&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;reading&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;;&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
-                &amp;lt;span class=&quot;nx&quot;&amp;gt;console&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;dir&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-            &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
-    &amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt;
+            &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;open&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;sp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;data&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lines&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;\n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// split line breaks&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// split pin and reading&lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// get rid of bad format&lt;/span&gt;
+                        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+                        &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;(\r\n&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r)&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/gm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                        &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reading&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+                    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 
-&amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// start recording request entry time&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;c1&quot;&gt;// start recording request entry time&lt;/span&gt;
 
-&amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;request&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;url&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;!=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;/poll&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// not poll&amp;lt;/span&amp;gt;
-    &amp;lt;span class=&quot;c1&quot;&amp;gt;// print non-polling command sent by Scratch       &amp;lt;/span&amp;gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;/poll&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// not poll&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// print non-polling command sent by Scratch		&lt;/span&gt;
 
-&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;else&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// Polling&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Polling&lt;/span&gt;
 
-    &amp;lt;span class=&quot;nb&quot;&amp;gt;Object&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;keys&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;).&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;forEach&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;c1&quot;&amp;gt;// prints &quot;capacity/13 2\n&quot;, for instance&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;write&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;capacity/&quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-    &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+        &lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        	&lt;span class=&quot;c1&quot;&gt;// prints &quot;capacity/13 2\n&quot;, for instance&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;capacity/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;\n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 
-&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// end if&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// end if&lt;/span&gt;
 
-&amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;end&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// HTTP port to listen to&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+    &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// HTTP port to listen to&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This runs on nodejs. You must have the &lt;a href=&quot;https://www.npmjs.com/package/serialport&quot;&gt;serialport&lt;/a&gt; package installed.&lt;/p&gt;
 
-&lt;h3&gt;Scratch Extension File&lt;/h3&gt;
+&lt;h3 id=&quot;scratch-extension-file&quot;&gt;Scratch Extension File&lt;/h3&gt;
 
 &lt;p&gt;You also need to define your own extension so Scratch can get data from your Helper App.&lt;/p&gt;
 
 &lt;p&gt;Write up a text file and call it Fruits.s2e, with below content:&lt;/p&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;    &lt;span class=&quot;s2&quot;&gt;&quot;extensionName&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DFRobot&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;extensionPort&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;blockSpecs&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;r&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Fruit reading at pin %n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;capacity&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;13&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;	&lt;span class=&quot;s2&quot;&gt;&quot;extensionName&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DFRobot&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;s2&quot;&gt;&quot;extensionPort&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;s2&quot;&gt;&quot;blockSpecs&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+		&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;r&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Fruit reading at pin %n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;capacity&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;13&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;the &quot;r&quot; means it is an input block. The &quot;capacity&quot; here is the reading variable identifier and must match the format we send from Nodejs server.&lt;/p&gt;
+&lt;p&gt;the “r” means it is an input block. The “capacity” here is the reading variable identifier and must match the format we send from Nodejs server.&lt;/p&gt;
 
-&lt;h3&gt;Setting up the Scratch Project&lt;/h3&gt;
+&lt;h3 id=&quot;setting-up-the-scratch-project&quot;&gt;Setting up the Scratch Project&lt;/h3&gt;
 
-&lt;p&gt;The Chinese is just the translation of &quot;Fruit reading at Pin&quot;. I would advise against printing this on your T-shirt.&lt;/p&gt;
+&lt;p&gt;The Chinese is just the translation of “Fruit reading at Pin”. I would advise against printing this on your T-shirt.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit%20Scratch.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/Fruit Scratch.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As you can see you can make Scratch to play any sound you like. This example just uses built-in piano tones. You can customise Scratch to play any sound of your choice.&lt;/p&gt;
 
@@ -507,9 +628,9 @@ if (workspace.toolbox_ &amp;amp;&amp;amp; workspace.toolbox_.tree_) {
 
 &lt;p&gt;Note that attaching fruit to the wires will increase the readings for the capacitance. If your fruit is large, remember to raise the threashold. Here I use 5 because wet paper tissues usually get a reading of 3.&lt;/p&gt;
 
-&lt;p&gt;Also don&#39;t let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.&lt;/p&gt;
+&lt;p&gt;Also don’t let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.&lt;/p&gt;
 
-&lt;h1&gt;Demo&lt;/h1&gt;
+&lt;h1 id=&quot;demo&quot;&gt;Demo&lt;/h1&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/fruit.jpg&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 </description>
@@ -528,68 +649,69 @@ if (workspace.toolbox_ &amp;amp;&amp;amp; workspace.toolbox_.tree_) {
         <title>Fruit Piano with Firmata</title>
         <description>&lt;p&gt;In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.&lt;/p&gt;
 
-&lt;h1&gt;Extending Firmata on Arduino&lt;/h1&gt;
+&lt;h1 id=&quot;extending-firmata-on-arduino&quot;&gt;Extending Firmata on Arduino&lt;/h1&gt;
 
 &lt;p&gt;I was strolling on google when a wild &lt;a href=&quot;http://blog.s4a.cat/2015/03/13/Extending-Firmata-for-Snap4Arduino.html&quot;&gt;tutorial&lt;/a&gt; appears. Thanks to this piece of example which encouraged me to give Firmata a try.&lt;/p&gt;
 
-&lt;p&gt;I was previously looking at Johnny-five&#39;s code and was properly scared off. The complexity is just too damn high.&lt;/p&gt;
+&lt;p&gt;I was previously looking at Johnny-five’s code and was properly scared off. The complexity is just too damn high.&lt;/p&gt;
 
 &lt;p&gt;However we are not toying with Johnny-five this time, just plain old Firmata.&lt;/p&gt;
 
 &lt;p&gt;First we open up the StandardFirmata ino file and insert this code:&lt;/p&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readCapacitivePin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
       &lt;span class=&quot;n&quot;&gt;Firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+      &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Also insert the readCapacitivePin function to the end of the file. You can find the code in &lt;a href=&quot;http://playground.arduino.cc/Code/CapacitiveSensor&quot;&gt;this post&lt;/a&gt;.&lt;/p&gt;
 
-&lt;h1&gt;Extending Firmata Nodejs client&lt;/h1&gt;
+&lt;h1 id=&quot;extending-firmata-nodejs-client&quot;&gt;Extending Firmata Nodejs client&lt;/h1&gt;
 
 &lt;p&gt;You can get your firmata module from npm.&lt;/p&gt;
 
 &lt;p&gt;Once you have installed the module, go to its directory and find &lt;code&gt;lib/firmata.js&lt;/code&gt;.
 Add the following code:&lt;/p&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x08&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;SYSEX_RESPONSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;SYSEX_RESPONSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
   &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
   &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
  &lt;span class=&quot;c1&quot;&gt;// console.log(board.currentBuffer.toString(&quot;hex&quot;));&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]){&lt;/span&gt;
     &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prototype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prototype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;queryPinCapacitance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;transport&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Buffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;START_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PIN_CAPACITANCE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;END_SYSEX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h1&gt;Testing&lt;/h1&gt;
+&lt;h1 id=&quot;testing&quot;&gt;Testing&lt;/h1&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;./lib/firmata.js&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;repl&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;./lib/firmata.js&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;repl&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
             &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;comName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Successfully Connected to &#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;firmata&amp;gt;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+		    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		        &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Successfully Connected to &#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		        &lt;span class=&quot;nx&quot;&gt;repl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;firmata&amp;gt;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;board&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
         &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;You can type in board.queryPinCapacitance(13) and try it out. Board setup is easy:&lt;/p&gt;
 
@@ -597,19 +719,19 @@ Add the following code:&lt;/p&gt;
 
 &lt;p&gt;Image curtesy to Arduino&lt;/p&gt;
 
-&lt;h1&gt;Firmataized Fruit Piano&lt;/h1&gt;
+&lt;h1 id=&quot;firmataized-fruit-piano&quot;&gt;Firmataized Fruit Piano&lt;/h1&gt;
 
 &lt;p&gt;Here is your Helper App code&lt;/p&gt;
 
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;serialport&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;firmata&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;firmata&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;http&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;defaultPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;// holding the values of each port in a map, updated continuously&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;serialPort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;nx&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
         &lt;span class=&quot;c1&quot;&gt;// Arduino COM ports usually have the manufacturer name start with &quot;Arduino&quot;&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;manufacturer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;indexOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arduino&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
@@ -623,37 +745,33 @@ Add the following code:&lt;/p&gt;
                     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
                 &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
             &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/p&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 
-&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// global http server&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&quot;c1&quot;&amp;gt;// start recording request entry time&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;c1&quot;&gt;// start recording request entry time&lt;/span&gt;
 
-&amp;lt;span class=&quot;k&quot;&amp;gt;if&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;request&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;url&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;!=&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s1&quot;&amp;gt;&#39;/poll&#39;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// not poll&amp;lt;/span&amp;gt;
-    &amp;lt;span class=&quot;c1&quot;&amp;gt;// print non-polling command sent by Scratch       &amp;lt;/span&amp;gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;/poll&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// not poll&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// print non-polling command sent by Scratch		&lt;/span&gt;
 
-&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;k&quot;&amp;gt;else&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// Polling&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Polling&lt;/span&gt;
 
-    &amp;lt;span class=&quot;nb&quot;&amp;gt;Object&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;keys&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;).&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;forEach&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;kd&quot;&amp;gt;function&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;)&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;p&quot;&amp;gt;{&amp;lt;/span&amp;gt;
-        &amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;write&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;(&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;capacity/&quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot; &quot;&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;nx&quot;&amp;gt;fruits&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;[&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;pinName&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;]&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;o&quot;&amp;gt;+&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;s2&quot;&amp;gt;&quot;\n&quot;&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;);&amp;lt;/span&amp;gt;
-    &amp;lt;span class=&quot;p&quot;&amp;gt;});&amp;lt;/span&amp;gt;
+        &lt;span class=&quot;nb&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;capacity/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fruits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pinName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;\n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 
-&amp;lt;span class=&quot;p&quot;&amp;gt;}&amp;lt;/span&amp;gt; &amp;lt;span class=&quot;c1&quot;&amp;gt;// end if&amp;lt;/span&amp;gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// end if&lt;/span&gt;
 
-&amp;lt;span class=&quot;nx&quot;&amp;gt;response&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;.&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;nx&quot;&amp;gt;end&amp;lt;/span&amp;gt;&amp;lt;span class=&quot;p&quot;&amp;gt;();&amp;lt;/span&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
+    &lt;span class=&quot;nx&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;listen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;23456&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
-
-&lt;h1&gt;Ready to Go&lt;/h1&gt;
+&lt;h1 id=&quot;ready-to-go&quot;&gt;Ready to Go&lt;/h1&gt;
 
 &lt;p&gt;You can just use the Scratch project in the previous Fruit Piano Scratch project. The Scratch project is athogonal to our Helper App implementation hence no change is needed.&lt;/p&gt;
 </description>
@@ -670,22 +788,21 @@ Add the following code:&lt;/p&gt;
     
       <item>
         <title>Scratch with Johnny-five</title>
-        <description>&lt;h1&gt;Installing Scratch for Windows XP&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;installing-scratch-for-windows-xp&quot;&gt;Installing Scratch for Windows XP&lt;/h1&gt;
 
-&lt;h2&gt;WHY?&lt;/h2&gt;
+&lt;h2 id=&quot;why&quot;&gt;WHY?&lt;/h2&gt;
 
-&lt;p&gt;Well because Scratch is used by teachers and students. They are usually found in places called schools. Schools may not have funding to buy latest models of PC frequently so some of them are still running XP. That&#39;s why.&lt;/p&gt;
+&lt;p&gt;Well because Scratch is used by teachers and students. They are usually found in places called schools. Schools may not have funding to buy latest models of PC frequently so some of them are still running XP. That’s why.&lt;/p&gt;
 
-&lt;h1&gt;What do you need?&lt;/h1&gt;
+&lt;h1 id=&quot;what-do-you-need&quot;&gt;What do you need?&lt;/h1&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://scratch.mit.edu/scratchr2/static/sa/Scratch-439.1.exe&quot;&gt;Scratch version 439.1&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://scratch.mit.edu/scratchr2/static/sa/Scratch-439.1.exe&quot;&gt;Scratch version 439.1&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
 
 &lt;p&gt;Scratch 2 Offline &lt;a href=&quot;https://scratch.mit.edu/scratch2download/&quot;&gt;documentation&lt;/a&gt; suggests if &lt;em&gt;Scratch 2 crashes&lt;/em&gt; on startup, you should reinstall. It does not say anything about &lt;em&gt;computer crash&lt;/em&gt;. FYI I did try reinstall and it did not help. The crash is consistent.&lt;/p&gt;
 
-&lt;h1&gt;What Else do you need?&lt;/h1&gt;
+&lt;h1 id=&quot;what-else-do-you-need&quot;&gt;What Else do you need?&lt;/h1&gt;
 
 &lt;p&gt;DO &lt;strong&gt;&lt;em&gt;NOT&lt;/em&gt;&lt;/strong&gt; update&lt;/p&gt;
 
@@ -701,38 +818,38 @@ Add the following code:&lt;/p&gt;
 
 &lt;p&gt;We spent too much time on this to know, leave no such things in the hands of the users.&lt;/p&gt;
 
-&lt;h2&gt;Disable Adobe Air Auto Update&lt;/h2&gt;
+&lt;h2 id=&quot;disable-adobe-air-auto-update&quot;&gt;Disable Adobe Air Auto Update&lt;/h2&gt;
 
-&lt;p&gt;They do have a way to disable automatic update. It requires either a file added to the user&#39;s application path, or registry editing. &lt;a href=&quot;https://forums.adobe.com/docs/DOC-1321&quot;&gt;See link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;They do have a way to disable automatic update. It requires either a file added to the user’s application path, or registry editing. &lt;a href=&quot;https://forums.adobe.com/docs/DOC-1321&quot;&gt;See link&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Also, disable update &lt;strong&gt;&lt;em&gt;Immediately&lt;/em&gt;&lt;/strong&gt; after Air installation. Once it gets the taste of the later versions, it is not even possible to install Scratch without updating Air, which would again crash the computer.&lt;/p&gt;
 
-&lt;h2&gt;Disable Scratch 2 Auto Update&lt;/h2&gt;
+&lt;h2 id=&quot;disable-scratch-2-auto-update&quot;&gt;Disable Scratch 2 Auto Update&lt;/h2&gt;
 
-&lt;p&gt;Scratch checks for the update version from Scratch&#39;s CDN site. Easy way is to modify hosts file and lead the CDN to localhost. But that would make the official site really ugly because it also hosts all the js and css files of the site.&lt;/p&gt;
+&lt;p&gt;Scratch checks for the update version from Scratch’s CDN site. Easy way is to modify hosts file and lead the CDN to localhost. But that would make the official site really ugly because it also hosts all the js and css files of the site.&lt;/p&gt;
 
 &lt;p&gt;Second workaround is tricking Scratch to think it actually has a higher version.
-Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&lt;/code&gt; and change the &lt;code&gt;&amp;lt;VersionNumber&amp;gt;&lt;/code&gt; content to 999. This is as high as it can get. Don&#39;t try 9999 or 99999. RTFM.&lt;/p&gt;
+Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&lt;/code&gt; and change the &lt;code&gt;&amp;lt;VersionNumber&amp;gt;&lt;/code&gt; content to 999. This is as high as it can get. Don’t try 9999 or 99999. RTFM.&lt;/p&gt;
 
-&lt;h2&gt;Two Stage Installation&lt;/h2&gt;
+&lt;h2 id=&quot;two-stage-installation&quot;&gt;Two Stage Installation&lt;/h2&gt;
 
-&lt;p&gt;Actually, &quot;two stage&quot; is euphemism. More like &quot;intentionally fail on the first run then reinstall&quot;.&lt;/p&gt;
+&lt;p&gt;Actually, “two stage” is euphemism. More like “intentionally fail on the first run then reinstall”.&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Install Scratch with default options. It will fire up Scratch after installation and on Windows XP, it will probably cause the blue screen of death.&lt;/li&gt;
-&lt;li&gt;Manually remove the &lt;code&gt;C:\Program Files\Scratch 2&lt;/code&gt; folder. Then install Scratch 2 again, but this time, uncheck the &lt;code&gt;Run application after installation&lt;/code&gt; checkbox.&lt;/li&gt;
+  &lt;li&gt;Install Scratch with default options. It will fire up Scratch after installation and on Windows XP, it will probably cause the blue screen of death.&lt;/li&gt;
+  &lt;li&gt;Manually remove the &lt;code&gt;C:\Program Files\Scratch 2&lt;/code&gt; folder. Then install Scratch 2 again, but this time, uncheck the &lt;code&gt;Run application after installation&lt;/code&gt; checkbox.&lt;/li&gt;
 &lt;/ol&gt;
-
 
 &lt;p&gt;Then you should be able to get Scratch running. Under certain conditions.&lt;/p&gt;
 
-&lt;h2&gt;Conditions You Say?&lt;/h2&gt;
+&lt;h2 id=&quot;conditions-you-say&quot;&gt;Conditions You Say?&lt;/h2&gt;
 
 &lt;p&gt;Yes. Scratch somehow still dies if you lauch it from the desktop shortcut. Instead, grab a Scratch 2 project file( with &lt;code&gt;.sb2&lt;/code&gt; file extension) and double click that file to open Scratch.&lt;/p&gt;
 
-&lt;h2&gt;Disclaimer&lt;/h2&gt;
+&lt;h2 id=&quot;disclaimer&quot;&gt;Disclaimer&lt;/h2&gt;
 
 &lt;p&gt;Above procedures are tested on XP Professional Simplified Chinese version. Other versions like Home and Enterprise have not been tested. Neither have other language packs.&lt;/p&gt;
+
 </description>
         <pubDate>Fri, 11 Sep 2015 00:00:00 +0800</pubDate>
         <link>http://rexpie.github.io/2015/09/11/installing-scratch-for-win-xp.html</link>
@@ -747,27 +864,27 @@ Edit the &lt;code&gt;%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml&
     
       <item>
         <title>Stress testing Mosquitto MQTT Broker Update 1</title>
-        <description>&lt;h1&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
+        <description>&lt;h1 id=&quot;stress-testing-mosquitto-update-1&quot;&gt;Stress Testing Mosquitto Update 1&lt;/h1&gt;
 
 &lt;p&gt;Last time I left a bit in the &lt;code&gt;TODO&lt;/code&gt;, saying that I will test with multiple clients on a host. I did.&lt;/p&gt;
 
-&lt;h2&gt;Env setup&lt;/h2&gt;
+&lt;h2 id=&quot;env-setup&quot;&gt;Env setup&lt;/h2&gt;
 
 &lt;p&gt;To compare the testing, I will give you the hardware settings:&lt;/p&gt;
 
-&lt;p&gt;Host            |CPU Core#  | Mem &lt;br/&gt;
---------------- |---------- |-----
+&lt;p&gt;Host			|CPU Core#	| Mem	
+—————	|———-	|—–
 comments: true
 comments: true
 comments: true
-VMware Guest    |1          |4g
-Physical        |2          |8g&lt;/p&gt;
+VMware Guest	|1			|4g
+Physical		|2			|8g&lt;/p&gt;
 
 &lt;p&gt;The clients are all VMware Guest Ubuntu Desktop machines cloned from the server. They have the same file limits, etc, nothing special.&lt;/p&gt;
 
 &lt;p&gt;I use bridge, not NAT for the network connectivity for the VMWare Guests, so they are just like other machines setup on the local network, not wrapped up inside the VM.&lt;/p&gt;
 
-&lt;h2&gt;Results&lt;/h2&gt;
+&lt;h2 id=&quot;results&quot;&gt;Results&lt;/h2&gt;
 
 &lt;p&gt;Quite interesting. The VM Guest, no matter how I tune the numbers, cannot establish more than 655XX TCP connections, regardless of the IP/port combinations.&lt;/p&gt;
 
@@ -779,15 +896,15 @@ Physical        |2          |8g&lt;/p&gt;
 
 &lt;p&gt;I used the same step to install a vanilla Ubuntu with the same iso image, followed the same steps I wrote myself to setup the server on the physical machine and guess what, I got more connections as expected.&lt;/p&gt;
 
-&lt;h3&gt;Final stats&lt;/h3&gt;
+&lt;h3 id=&quot;final-stats&quot;&gt;Final stats&lt;/h3&gt;
 
-&lt;p&gt;Host            |CPU%   |RAM%   |Conn Speed     |Max Conn
---------------- |------ |------ |---------------|--------
+&lt;p&gt;Host			|CPU%	|RAM%	|Conn Speed		|Max Conn
+—————	|——	|——	|—————|——–
 comments: true
 comments: true
 comments: true
-VMware Guest    |90%+   |0.4%   |2000+/s -&gt; ~100/s| &lt;strong&gt;65,535&lt;/strong&gt;
-Physical        |90%+   |0.4%   |3000+/s -&gt; ~100/s| &lt;strong&gt;100,000+&lt;/strong&gt;&lt;/p&gt;
+VMware Guest	|90%+	|0.4%	|2000+/s -&amp;gt; ~100/s| &lt;strong&gt;65,535&lt;/strong&gt;
+Physical		|90%+	|0.4%	|3000+/s -&amp;gt; ~100/s| &lt;strong&gt;100,000+&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The speed of establishing new connections wears down gradually. Mosquitto can build up 10K connections in a few seconds, but the speed slows down after that.&lt;/p&gt;
 
@@ -798,127 +915,6 @@ Physical        |90%+   |0.4%   |3000+/s -&gt; ~100/s| &lt;strong&gt;100,000+&lt
         <guid isPermaLink="true">http://rexpie.github.io/2015/08/31/stress-testing-mosquitto-update-1.html</guid>
         
         <category>mqtt</category>
-        
-        <category>mosquitto</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Load Balancing with HAProxy</title>
-        <description>&lt;h1&gt;Need to cluster&lt;/h1&gt;
-
-&lt;p&gt;IBM has a &lt;a href=&quot;http://www.redbooks.ibm.com/redbooks/pdfs/sg248054.pdf&quot;&gt;Redbook&lt;/a&gt; for its own IOT service environment. The book also described the topologies of enterprise MQTT service architectures. So, to cluster some mosquitto brokers, we need some other tools.&lt;/p&gt;
-
-&lt;p&gt;Mosquitto is a single thread process. To scale out, we need tools to better monitor and manage them.&lt;/p&gt;
-
-&lt;h1&gt;Cue in load balancing&lt;/h1&gt;
-
-&lt;p&gt;I followed the steps in this nice &lt;a href=&quot;https://serversforhackers.com/load-balancing-with-haproxy&quot;&gt;tutorial&lt;/a&gt;, others you googled might be just as good, as HAProxy is very easy to install, configure and run.&lt;/p&gt;
-
-&lt;p&gt;I changed the configuration to match our need for mqtt connections.&lt;/p&gt;
-
-&lt;p&gt;&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-cfg&quot; data-lang=&quot;cfg&quot;&gt;listen mqtt
-  bind &lt;em&gt;:1883
-  bind &lt;/em&gt;:1884
-  mode tcp
-  maxconn 200000
-  option tcplog
-  option redispatch
-  balance leastconn
-  server serv1 192.168.0.36:1883 source 0.0.0.0:1024-65535 check
-  server serv2 192.168.0.136:1883 source 0.0.0.0:1024-65535 check&lt;/p&gt;
-
-&lt;p&gt;listen stats *:1936
-  stats enable
-  stats uri /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&lt;/p&gt;
-
-&lt;h2&gt;Configurations explained&lt;/h2&gt;
-
-&lt;h2&gt;&lt;code&gt;option redispatch&lt;/code&gt;&lt;/h2&gt;
-
-&lt;p&gt;This is used to tell HAProxy to retry to another backend server when one of the servers goes down, rather than giving a 503 error back to the fronted.&lt;/p&gt;
-
-&lt;h2&gt;&lt;code&gt;balance leastconn&lt;/code&gt;&lt;/h2&gt;
-
-&lt;p&gt;This is the balancing algorithm, we expect to have many TCP connections with little traffic and low spikes so the we should use this method to pan out the number of connections evenly.&lt;/p&gt;
-
-&lt;h2&gt;&lt;code&gt;source 0.0.0.0:1024-65535&lt;/code&gt;&lt;/h2&gt;
-
-&lt;p&gt;See this nice &lt;a href=&quot;http://comments.gmane.org/gmane.comp.web.haproxy/5594&quot;&gt;email exchange&lt;/a&gt;, also see haproxy&#39;s &lt;a href=&quot;https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4-source&quot;&gt;configuration manual&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Basically,&lt;/p&gt;
-
-&lt;h2&gt;Monitoring HAProxy&lt;/h2&gt;
-
-&lt;p&gt;The HAProxy comes with a handy web interface for quick monitoring. The stats block of the configuration shows how to do this. I left out the &lt;code&gt;auth&lt;/code&gt; config so I don&#39;t have to type in user name and password every now and then.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://rexpie.github.io/assets/haproxystat.png&quot; title=&quot;HAProxy Stats Screenshot&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
-
-&lt;h1&gt;Conclusion&lt;/h1&gt;
-
-&lt;p&gt;HAProxy can be used to load balance a cluster of single-threaded mosquitto servers in a LAN environment. We can even setup multiple clusters globally.&lt;/p&gt;
-
-&lt;p&gt;Next we maybe can try out the provisioning service as to auto configure the MQTT clients.&lt;/p&gt;
-</description>
-        <pubDate>Wed, 26 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/26/loadbalancing-with-haproxy.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/26/loadbalancing-with-haproxy.html</guid>
-        
-        <category>haproxy,</category>
-        
-        <category>load</category>
-        
-        <category>balancing,</category>
-        
-        <category>mosquitto</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Mosquitto Troubleshooting</title>
-        <description>&lt;h1&gt;Issues with mosquitto_pub&lt;/h1&gt;
-
-&lt;p&gt;When I tried to execute the &lt;code&gt;mosquitto_pub&lt;/code&gt; command, it complains about a lib missing:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
-mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot open shared object file: No such file or directory
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;I &lt;strong&gt;built&lt;/strong&gt; this from source. Well seems like mosquitto needs a bit more consistent at housekeeping when it tries to install and execute.&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s dig in.&lt;/p&gt;
-
-&lt;p&gt;First use strace to look what it is looking for:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ strace mosquitto_pub -t &#39;/mqtt-bench/benchmark&#39; -m &#39;testContent&#39;
-open(&quot;/usr/lib/x86_64/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-stat(&quot;/usr/lib/x86_64&quot;, 0x7fff1e3b13f0) = -1 ENOENT (No such file or directory)
-open(&quot;/usr/lib/libmosquitto.so.1&quot;, O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Okay so it looks through &lt;code&gt;/usr/lib&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Where &lt;strong&gt;is&lt;/strong&gt; the lib then?&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;rex@ubuntu:~$ locate libmosquitto.so|xargs ls -l
-/usr/local/lib/libmosquitto.so
-/usr/local/lib/libmosquitto.so.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;So it looks at &lt;code&gt;/usr/lib&lt;/code&gt; rather than &lt;code&gt;/usr/local/lib&lt;/code&gt;. Fair enough, I did not specify the prefix when building.&lt;/p&gt;
-
-&lt;p&gt;Fix is easy:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-        <pubDate>Tue, 25 Aug 2015 00:00:00 +0800</pubDate>
-        <link>http://rexpie.github.io/2015/08/25/mosquitto-troubleshooting.html</link>
-        <guid isPermaLink="true">http://rexpie.github.io/2015/08/25/mosquitto-troubleshooting.html</guid>
-        
-        <category>mqtt,</category>
         
         <category>mosquitto</category>
         

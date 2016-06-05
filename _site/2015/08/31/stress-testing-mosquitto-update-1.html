@@ -72,27 +72,27 @@
   </header>
 
   <article class="post-content">
-    <h1>Stress Testing Mosquitto Update 1</h1>
+    <h1 id="stress-testing-mosquitto-update-1">Stress Testing Mosquitto Update 1</h1>
 
 <p>Last time I left a bit in the <code>TODO</code>, saying that I will test with multiple clients on a host. I did.</p>
 
-<h2>Env setup</h2>
+<h2 id="env-setup">Env setup</h2>
 
 <p>To compare the testing, I will give you the hardware settings:</p>
 
-<p>Host            |CPU Core#  | Mem <br/>
---------------- |---------- |-----
+<p>Host			|CPU Core#	| Mem	
+—————	|———-	|—–
 comments: true
 comments: true
 comments: true
-VMware Guest    |1          |4g
-Physical        |2          |8g</p>
+VMware Guest	|1			|4g
+Physical		|2			|8g</p>
 
 <p>The clients are all VMware Guest Ubuntu Desktop machines cloned from the server. They have the same file limits, etc, nothing special.</p>
 
 <p>I use bridge, not NAT for the network connectivity for the VMWare Guests, so they are just like other machines setup on the local network, not wrapped up inside the VM.</p>
 
-<h2>Results</h2>
+<h2 id="results">Results</h2>
 
 <p>Quite interesting. The VM Guest, no matter how I tune the numbers, cannot establish more than 655XX TCP connections, regardless of the IP/port combinations.</p>
 
@@ -104,15 +104,15 @@ Physical        |2          |8g</p>
 
 <p>I used the same step to install a vanilla Ubuntu with the same iso image, followed the same steps I wrote myself to setup the server on the physical machine and guess what, I got more connections as expected.</p>
 
-<h3>Final stats</h3>
+<h3 id="final-stats">Final stats</h3>
 
-<p>Host            |CPU%   |RAM%   |Conn Speed     |Max Conn
---------------- |------ |------ |---------------|--------
+<p>Host			|CPU%	|RAM%	|Conn Speed		|Max Conn
+—————	|——	|——	|—————|——–
 comments: true
 comments: true
 comments: true
-VMware Guest    |90%+   |0.4%   |2000+/s -> ~100/s| <strong>65,535</strong>
-Physical        |90%+   |0.4%   |3000+/s -> ~100/s| <strong>100,000+</strong></p>
+VMware Guest	|90%+	|0.4%	|2000+/s -&gt; ~100/s| <strong>65,535</strong>
+Physical		|90%+	|0.4%	|3000+/s -&gt; ~100/s| <strong>100,000+</strong></p>
 
 <p>The speed of establishing new connections wears down gradually. Mosquitto can build up 10K connections in a few seconds, but the speed slows down after that.</p>
 

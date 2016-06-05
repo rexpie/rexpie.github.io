@@ -72,144 +72,138 @@
   </header>
 
   <article class="post-content">
-    <h1>Fruit Piano with Arduino/Scratch</h1>
+    <h1 id="fruit-piano-with-arduinoscratch">Fruit Piano with Arduino/Scratch</h1>
 
-<p>We have seen many interesting musical applications with Arduino <a href="https://www.youtube.com/watch?v=jAVE6T7FqJs">here</a> and <a href="https://www.youtube.com/watch?v=yRvC8lNsvZU">there</a>. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don't have those trained hands?</p>
+<p>We have seen many interesting musical applications with Arduino <a href="https://www.youtube.com/watch?v=jAVE6T7FqJs">here</a> and <a href="https://www.youtube.com/watch?v=yRvC8lNsvZU">there</a>. They are quite fun if you have enough experience with musical instruments, but what if you want to appear better when you don’t have those trained hands?</p>
 
 <p>Scratch comes to the rescue.</p>
 
 <p>Here we combine the quick prototype capabilities of Arduino and rich interactive libraries of Scratch to make the musics a bit more colourful.</p>
 
-<h1>System Architecture</h1>
+<h1 id="system-architecture">System Architecture</h1>
 
-<p><img src="http://rexpie.github.io/assets/Fruit%20Piano%20Arch.svg" alt="image" /></p>
+<p><img src="http://rexpie.github.io/assets/Fruit Piano Arch.svg" alt="image" /></p>
 
 <p>The system is quite similar to the one with Firmata in my another <a href="http://rexpie.github.io/2015/08/23/extending-scratch.html">article</a>, except that it does not use Firmata. Extending firmata is of course a choice, however a quite expensive one.</p>
 
 <p>In this system, Arduino reports the status of each pin to the Helper App, which bundles the results and send over to Scratch. Scratch listens for changes in the pin values and triggers a sound accordingly when the threshold is exceeded.</p>
 
-<h2>Reading the input capacitance from digital pin</h2>
+<h2 id="reading-the-input-capacitance-from-digital-pin">Reading the input capacitance from digital pin</h2>
 
-<p>This is essentially witchcraft. You can refer to <a href="http://playground.arduino.cc/Code/CapacitiveSensor">this post</a>. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don't want to waste food just for testing.</p>
+<p>This is essentially witchcraft. You can refer to <a href="http://playground.arduino.cc/Code/CapacitiveSensor">this post</a>. You can use your finger to test its effect. Or if you have rather dry fingers, you can stick the wire into a piece of rolled-up wet paper tissue to simulate fruit. We surely don’t want to waste food just for testing.</p>
 
-<h2>Channel Between Scratch and Arduino</h2>
+<h2 id="channel-between-scratch-and-arduino">Channel Between Scratch and Arduino</h2>
 
-<h3>Arduino Code</h3>
+<h3 id="arduino-code">Arduino Code</h3>
 
-<p><figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// setup Serial port baud rate
 </span>  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">115200</span><span class="p">);</span>
-<span class="p">}</span></p>
+<span class="p">}</span>
 
-<p><span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span></p>
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
 
-<p>  <span class="c1">// scan every digital pin
-</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span></p>
+  <span class="c1">// scan every digital pin
+</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+  
+    <span class="cm">/* Prints out:
+    * 2 2
+    * 3 2
+    * etc.*/</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">" "</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">readCapacitivePin</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
 
-<pre><code>&lt;span class="cm"&gt;/* Prints out:
-* 2 2
-* 3 2
-* etc.*/&lt;/span&gt;
-&lt;span class="n"&gt;Serial&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="n"&gt;Serial&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;" "&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="n"&gt;Serial&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;readCapacitivePin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
-&lt;span class="n"&gt;Serial&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-
-&lt;span class="c1"&gt;// no delay causes printing garbage
-</code></pre>
-
-<p></span>    <span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="c1">// no delay causes printing garbage
+</span>    <span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></figure></p>
+<span class="p">}</span></code></pre></figure>
 
 <p>This code just loops over each pin and report their capacitance readings to the serial port.</p>
 
-<h3>Helper App Code</h3>
+<h3 id="helper-app-code">Helper App Code</h3>
 
-<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span></p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
 
-<p><span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
 <span class="c1">// holding the values of each port in a map, updated continuously</span>
-<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span></p>
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span>
 
-<p><span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Arduino COM ports usually have the manufacturer name start with "Arduino"</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">"arduino"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span></p>
+            <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
 
-<pre><code>        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;sp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;serialPort&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;SerialPort&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;defaultPort&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-            &lt;span class="na"&gt;baudrate&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;115200&lt;/span&gt; &lt;span class="c1"&gt;// must match the baud rate in the Arduino sketch code&lt;/span&gt;
-        &lt;span class="p"&gt;});&lt;/span&gt;
+            <span class="kd">var</span> <span class="nx">sp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">serialPort</span><span class="p">.</span><span class="nx">SerialPort</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="p">{</span>
+                <span class="na">baudrate</span><span class="p">:</span> <span class="mi">115200</span> <span class="c1">// must match the baud rate in the Arduino sketch code</span>
+            <span class="p">});</span>
 
-        &lt;span class="nx"&gt;sp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"open"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-            &lt;span class="nx"&gt;sp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'data'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-                &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toString&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
-                &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;lines&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"\n"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// split line breaks&lt;/span&gt;
-                &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;columns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;line&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;" "&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// split pin and reading&lt;/span&gt;
-                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;columns&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;length&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// get rid of bad format&lt;/span&gt;
-                    &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;pin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;columns&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
-                    &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;reading&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;columns&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
-                    &lt;span class="nx"&gt;reading&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;reading&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sr"&gt;/&lt;/span&gt;&lt;span class="se"&gt;(\r\n&lt;/span&gt;&lt;span class="sr"&gt;|&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="sr"&gt;|&lt;/span&gt;&lt;span class="se"&gt;\r)&lt;/span&gt;&lt;span class="sr"&gt;/gm&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;""&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-                    &lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;pin&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;reading&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-                &lt;span class="p"&gt;}&lt;/span&gt;
-                &lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-            &lt;span class="p"&gt;});&lt;/span&gt;
-        &lt;span class="p"&gt;});&lt;/span&gt;
-    &lt;span class="p"&gt;}&lt;/span&gt;
+            <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"open"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">sp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">line</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+                    <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">"\n"</span><span class="p">);</span> <span class="c1">// split line breaks</span>
+                    <span class="kd">var</span> <span class="nx">columns</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">);</span> <span class="c1">// split pin and reading</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">columns</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// get rid of bad format</span>
+                        <span class="kd">var</span> <span class="nx">pin</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                        <span class="kd">var</span> <span class="nx">reading</span> <span class="o">=</span> <span class="nx">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                        <span class="nx">reading</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">(\r\n</span><span class="sr">|</span><span class="se">\n</span><span class="sr">|</span><span class="se">\r)</span><span class="sr">/gm</span><span class="p">,</span> <span class="s2">""</span><span class="p">);</span>
+                        <span class="nx">fruits</span><span class="p">[</span><span class="nx">pin</span><span class="p">]</span> <span class="o">=</span> <span class="nx">reading</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">fruits</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
 
-&lt;span class="p"&gt;});&lt;/span&gt;
-</code></pre>
+    <span class="p">});</span>
+<span class="p">});</span>
 
-<p><span class="p">});</span></p>
-
-<p><span class="c1">// global http server</span>
+<span class="c1">// global http server</span>
 <span class="kd">var</span> <span class="nx">server</span><span class="p">;</span>
-<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span></p>
+<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
 
-<pre><code>&lt;span class="c1"&gt;// start recording request entry time&lt;/span&gt;
+    <span class="c1">// start recording request entry time</span>
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s1"&gt;'/poll'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// not poll&lt;/span&gt;
-    &lt;span class="c1"&gt;// print non-polling command sent by Scratch       &lt;/span&gt;
+    <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="s1">'/poll'</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// not poll</span>
+        <span class="c1">// print non-polling command sent by Scratch		</span>
 
-&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// Polling&lt;/span&gt;
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// Polling</span>
 
-    &lt;span class="nb"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;keys&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;forEach&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pinName&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="c1"&gt;// prints "capacity/13 2\n", for instance&lt;/span&gt;
-        &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"capacity/"&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;pinName&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;" "&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;pinName&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;"\n"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="p"&gt;});&lt;/span&gt;
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">fruits</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">pinName</span><span class="p">)</span> <span class="p">{</span>
+        	<span class="c1">// prints "capacity/13 2\n", for instance</span>
+            <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"capacity/"</span> <span class="o">+</span> <span class="nx">pinName</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinName</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"\n"</span><span class="p">);</span>
+        <span class="p">});</span>
 
-&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="c1"&gt;// end if&lt;/span&gt;
+    <span class="p">}</span> <span class="c1">// end if</span>
 
-&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;end&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
-</code></pre>
-
-<p><span class="p">});</span>
-<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span> <span class="c1">// HTTP port to listen to</span></code></pre></figure></p>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span> <span class="c1">// HTTP port to listen to</span></code></pre></figure>
 
 <p>This runs on nodejs. You must have the <a href="https://www.npmjs.com/package/serialport">serialport</a> package installed.</p>
 
-<h3>Scratch Extension File</h3>
+<h3 id="scratch-extension-file">Scratch Extension File</h3>
 
 <p>You also need to define your own extension so Scratch can get data from your Helper App.</p>
 
 <p>Write up a text file and call it Fruits.s2e, with below content:</p>
 
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>    <span class="s2">"extensionName"</span><span class="err">:</span> <span class="s2">"DFRobot"</span><span class="p">,</span>
-    <span class="s2">"extensionPort"</span><span class="err">:</span> <span class="mi">23456</span><span class="p">,</span>
-    <span class="s2">"blockSpecs"</span><span class="err">:</span> <span class="p">[</span>
-        <span class="p">[</span><span class="s2">"r"</span><span class="p">,</span> <span class="s2">"Fruit reading at pin %n"</span><span class="p">,</span><span class="s2">"capacity"</span><span class="p">,</span> <span class="s2">"13"</span><span class="p">]</span>
-    <span class="p">]</span>
-<span class="p">}</span></code></pre></figure></p>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>	<span class="s2">"extensionName"</span><span class="err">:</span> <span class="s2">"DFRobot"</span><span class="p">,</span>
+	<span class="s2">"extensionPort"</span><span class="err">:</span> <span class="mi">23456</span><span class="p">,</span>
+	<span class="s2">"blockSpecs"</span><span class="err">:</span> <span class="p">[</span>
+		<span class="p">[</span><span class="s2">"r"</span><span class="p">,</span> <span class="s2">"Fruit reading at pin %n"</span><span class="p">,</span><span class="s2">"capacity"</span><span class="p">,</span> <span class="s2">"13"</span><span class="p">]</span>
+	<span class="p">]</span>
+<span class="p">}</span></code></pre></figure>
 
-<p>the "r" means it is an input block. The "capacity" here is the reading variable identifier and must match the format we send from Nodejs server.</p>
+<p>the “r” means it is an input block. The “capacity” here is the reading variable identifier and must match the format we send from Nodejs server.</p>
 
-<h3>Setting up the Scratch Project</h3>
+<h3 id="setting-up-the-scratch-project">Setting up the Scratch Project</h3>
 
-<p>The Chinese is just the translation of "Fruit reading at Pin". I would advise against printing this on your T-shirt.</p>
+<p>The Chinese is just the translation of “Fruit reading at Pin”. I would advise against printing this on your T-shirt.</p>
 
-<p><img src="http://rexpie.github.io/assets/Fruit%20Scratch.png" alt="image" /></p>
+<p><img src="http://rexpie.github.io/assets/Fruit Scratch.png" alt="image" /></p>
 
 <p>As you can see you can make Scratch to play any sound you like. This example just uses built-in piano tones. You can customise Scratch to play any sound of your choice.</p>
 
@@ -217,9 +211,9 @@
 
 <p>Note that attaching fruit to the wires will increase the readings for the capacitance. If your fruit is large, remember to raise the threashold. Here I use 5 because wet paper tissues usually get a reading of 3.</p>
 
-<p>Also don't let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.</p>
+<p>Also don’t let the fruit touch each other. Once they touch each other, the reading will reach maximum for both pins that are attached to fruit.</p>
 
-<h1>Demo</h1>
+<h1 id="demo">Demo</h1>
 
 <p><img src="http://rexpie.github.io/assets/fruit.jpg" alt="image" /></p>
 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Controlling Arduino with Email</title>
+  <meta name="description" content="Controlling Arduino with Email">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://rexpie.github.io/2016/06/05/nodered-for-iot.html">
+  <link rel="alternate" type="application/rss+xml" title="Rex's Blog" href="http://rexpie.github.io/feed.xml" />
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-66646350-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Rex's Blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">Rex Xia</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Controlling Arduino with Email</h1>
+    <p class="post-meta">Jun 5, 2016</p>
+  </header>
+
+  <article class="post-content">
+    <h1 id="controlling-arduino-with-email">Controlling Arduino with Email</h1>
+
+<p>Here I am taking the advantage of the Node-RED tool and the email service to build a simple but awesome IOT control unit.</p>
+
+<p>You can remotely control your Arduino board by sending an email to your own account. The process roughly takes half an hour, with minimum coding required.</p>
+
+<p><a href="http://nodered.org">Node-RED</a> is a visual programming tool for Internet of Things.
+IBM is actively bringing its latest functions, including Waston and IOT service, into the toolbox ever since its acquisition.
+We are using Node-RED to demonstrate how to setup a simple connected IOT control hub.</p>
+
+<h1 id="system-environments">System Environments</h1>
+
+<p>Hardware list:</p>
+
+<ul>
+  <li>Mac OS 10.11.5</li>
+  <li>Arduino Uno board of your choice, I am using one from <a href="http://www.dfrobot.com/index.php?route=product/product&amp;product_id=838&amp;search=uno&amp;description=true">DFRobot</a></li>
+</ul>
+
+<h1 id="software-setup">Software setup</h1>
+
+<h2 id="flash-firmata-into-your-uno-board">Flash Firmata into Your Uno Board</h2>
+
+<p>There is a nice <a href="http://www.instructables.com/id/Arduino-Installing-Standard-Firmata/">tutorial</a> for you.</p>
+
+<h2 id="install-node-red">Install Node-RED</h2>
+
+<p>Please follow the <a href="http://nodered.org/docs/hardware/arduino">official Arduino documentation from Node-RED</a>.</p>
+
+<p>As soon as you get past the first blinking example, you can start to go to the IOT part.</p>
+
+<h2 id="build-control-flow">Build Control flow</h2>
+
+<p>Here is the simple flow setup.</p>
+
+<p><img src="http://rexpie.github.io/assets/node-red.png" alt="image" /></p>
+
+<h3 id="configure-email-node">Configure Email Node</h3>
+
+<p>Now we can configure the email node. I am using the Microsoft office email server. If you are using other
+email service providers, please check your server settings for setting up an <code>imap</code> client.</p>
+
+<p><img src="http://rexpie.github.io/assets/node-red_email.png" alt="image" /></p>
+
+<p>And also if you are using <em>Gmail</em>, you need to create an application specific password for third-party application authentication.</p>
+
+<h3 id="configure-function-node">Configure Function Node</h3>
+
+<p>We need a tiny bit of code to interpret the email messages before relay that on to your Arduino board.</p>
+
+<p>Specifically, we are using the email’s <strong>subject</strong> to control our Arduino board. Because some server may automatically attach or transform the email <strong>body</strong> content or format for better user experience (in its own opinion), it would be easier to write working code for our example using only the <strong>email subject</strong>.</p>
+
+<p>Here is the code</p>
+
+<p><code>javascript
+    msg.payload = parseInt(msg.topic);  
+    return msg;
+</code></p>
+
+<p><img src="http://rexpie.github.io/assets/node-red_function.png" alt="image" /></p>
+
+<h3 id="configure-the-arduino-led-node">Configure the Arduino LED Node</h3>
+
+<p>You should have configured the LED node on pin 13 already if you have passed the example. But here is a screenshot just in case.</p>
+
+<p><img src="http://rexpie.github.io/assets/node-red_pin.png" alt="image" /></p>
+
+<h1 id="test">Test</h1>
+
+<p>Now you can send an email to your account, with the subject of a single digit: 1( or 0 if your pin 13 LED is already turned on). You should see the LED on the board change after about 10 or 20 seconds after you have sent the email.</p>
+
+<p>You can leave the email body empty, we are not going to use that part for now. However you can choose to try more tricks with the email body once you feel more confident.</p>
+
+<h1 id="how-it-works">How It Works</h1>
+
+<p>According to Node-RED documentation, the email node will try to get your latest email from the given mail folder between the given time interval. It will notice any new email, and pass on email information to our logical function. Then our function tries to interpret the subject to an integer and fill in the data our Arduino output pin needs. Finally the Arduino pin node controls the board using firmata protocol and changes the LED status.</p>
+
+<p>I really wish you had fun using Node-RED and Arduino. Firmata is a great way to communicate with the board, and Node-RED surely is a fast way to build IOT control layer. Plus you don’t have to pay for email service these days, so you don’t even need to buy public domain IP address to remotely control your board across different network domains. All you need is something that runs nodejs with a serial port. On that part I would recommend either the <a href="http://www.dfrobot.com/index.php?route=product/search&amp;description=true&amp;search=berry">Raspberry Pi</a> or the <a href="http://www.dfrobot.com/index.php?route=product/product&amp;product_id=1405&amp;search=lattepanda&amp;description=true#.V1RIHVd7zCc">LattePanda</a>.</p>
+
+  </article>
+
+</div>
+
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rexia';
+	var disqus_developer = 1;
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rexia';
+    var disqus_developer = 1;
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+  
+  
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Rex's Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Rex's Blog</li>
+          <li><a href="mailto:rexpie@gmail.com">rexpie@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/rexpie">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">rexpie</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Soft sides and blind spots of IOT, hardware, Arduino.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

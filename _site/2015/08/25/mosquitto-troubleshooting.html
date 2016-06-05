@@ -72,7 +72,7 @@
   </header>
 
   <article class="post-content">
-    <h1>Issues with mosquitto_pub</h1>
+    <h1 id="issues-with-mosquittopub">Issues with mosquitto_pub</h1>
 
 <p>When I tried to execute the <code>mosquitto_pub</code> command, it complains about a lib missing:</p>
 
@@ -82,7 +82,7 @@ mosquitto_pub: error while loading shared libraries: libmosquitto.so.1: cannot o
 
 <p>I <strong>built</strong> this from source. Well seems like mosquitto needs a bit more consistent at housekeeping when it tries to install and execute.</p>
 
-<p>Let's dig in.</p>
+<p>Let’s dig in.</p>
 
 <p>First use strace to look what it is looking for:</p>
 
@@ -107,6 +107,7 @@ open("/usr/lib/libmosquitto.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file
 
 <pre><code>sudo ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1
 </code></pre>
+
 
   </article>
 

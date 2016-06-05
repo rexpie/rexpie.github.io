@@ -72,22 +72,21 @@
   </header>
 
   <article class="post-content">
-    <h1>Installing Scratch for Windows XP</h1>
+    <h1 id="installing-scratch-for-windows-xp">Installing Scratch for Windows XP</h1>
 
-<h2>WHY?</h2>
+<h2 id="why">WHY?</h2>
 
-<p>Well because Scratch is used by teachers and students. They are usually found in places called schools. Schools may not have funding to buy latest models of PC frequently so some of them are still running XP. That's why.</p>
+<p>Well because Scratch is used by teachers and students. They are usually found in places called schools. Schools may not have funding to buy latest models of PC frequently so some of them are still running XP. That’s why.</p>
 
-<h1>What do you need?</h1>
+<h1 id="what-do-you-need">What do you need?</h1>
 
 <ul>
-<li><a href="https://scratch.mit.edu/scratchr2/static/sa/Scratch-439.1.exe">Scratch version 439.1</a></li>
+  <li><a href="https://scratch.mit.edu/scratchr2/static/sa/Scratch-439.1.exe">Scratch version 439.1</a></li>
 </ul>
-
 
 <p>Scratch 2 Offline <a href="https://scratch.mit.edu/scratch2download/">documentation</a> suggests if <em>Scratch 2 crashes</em> on startup, you should reinstall. It does not say anything about <em>computer crash</em>. FYI I did try reinstall and it did not help. The crash is consistent.</p>
 
-<h1>What Else do you need?</h1>
+<h1 id="what-else-do-you-need">What Else do you need?</h1>
 
 <p>DO <strong><em>NOT</em></strong> update</p>
 
@@ -103,38 +102,38 @@
 
 <p>We spent too much time on this to know, leave no such things in the hands of the users.</p>
 
-<h2>Disable Adobe Air Auto Update</h2>
+<h2 id="disable-adobe-air-auto-update">Disable Adobe Air Auto Update</h2>
 
-<p>They do have a way to disable automatic update. It requires either a file added to the user's application path, or registry editing. <a href="https://forums.adobe.com/docs/DOC-1321">See link</a></p>
+<p>They do have a way to disable automatic update. It requires either a file added to the user’s application path, or registry editing. <a href="https://forums.adobe.com/docs/DOC-1321">See link</a></p>
 
 <p>Also, disable update <strong><em>Immediately</em></strong> after Air installation. Once it gets the taste of the later versions, it is not even possible to install Scratch without updating Air, which would again crash the computer.</p>
 
-<h2>Disable Scratch 2 Auto Update</h2>
+<h2 id="disable-scratch-2-auto-update">Disable Scratch 2 Auto Update</h2>
 
-<p>Scratch checks for the update version from Scratch's CDN site. Easy way is to modify hosts file and lead the CDN to localhost. But that would make the official site really ugly because it also hosts all the js and css files of the site.</p>
+<p>Scratch checks for the update version from Scratch’s CDN site. Easy way is to modify hosts file and lead the CDN to localhost. But that would make the official site really ugly because it also hosts all the js and css files of the site.</p>
 
 <p>Second workaround is tricking Scratch to think it actually has a higher version.
-Edit the <code>%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml</code> and change the <code>&lt;VersionNumber&gt;</code> content to 999. This is as high as it can get. Don't try 9999 or 99999. RTFM.</p>
+Edit the <code>%ProgramFiles(x86)%\Scratch 2\META-INF\AIR\application.xml</code> and change the <code>&lt;VersionNumber&gt;</code> content to 999. This is as high as it can get. Don’t try 9999 or 99999. RTFM.</p>
 
-<h2>Two Stage Installation</h2>
+<h2 id="two-stage-installation">Two Stage Installation</h2>
 
-<p>Actually, "two stage" is euphemism. More like "intentionally fail on the first run then reinstall".</p>
+<p>Actually, “two stage” is euphemism. More like “intentionally fail on the first run then reinstall”.</p>
 
 <ol>
-<li>Install Scratch with default options. It will fire up Scratch after installation and on Windows XP, it will probably cause the blue screen of death.</li>
-<li>Manually remove the <code>C:\Program Files\Scratch 2</code> folder. Then install Scratch 2 again, but this time, uncheck the <code>Run application after installation</code> checkbox.</li>
+  <li>Install Scratch with default options. It will fire up Scratch after installation and on Windows XP, it will probably cause the blue screen of death.</li>
+  <li>Manually remove the <code>C:\Program Files\Scratch 2</code> folder. Then install Scratch 2 again, but this time, uncheck the <code>Run application after installation</code> checkbox.</li>
 </ol>
-
 
 <p>Then you should be able to get Scratch running. Under certain conditions.</p>
 
-<h2>Conditions You Say?</h2>
+<h2 id="conditions-you-say">Conditions You Say?</h2>
 
 <p>Yes. Scratch somehow still dies if you lauch it from the desktop shortcut. Instead, grab a Scratch 2 project file( with <code>.sb2</code> file extension) and double click that file to open Scratch.</p>
 
-<h2>Disclaimer</h2>
+<h2 id="disclaimer">Disclaimer</h2>
 
 <p>Above procedures are tested on XP Professional Simplified Chinese version. Other versions like Home and Enterprise have not been tested. Neither have other language packs.</p>
+
 
   </article>
 

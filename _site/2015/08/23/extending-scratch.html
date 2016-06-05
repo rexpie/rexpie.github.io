@@ -72,7 +72,7 @@
   </header>
 
   <article class="post-content">
-    <h2>Why Scratch</h2>
+    <h2 id="why-scratch">Why Scratch</h2>
 
 <p><a href="https://scratch.mit.edu/">Scratch2</a> is becoming more mature with a steadily growing user community. MIT has done a great job at propelling programming education.</p>
 
@@ -80,47 +80,46 @@
 
 <p>The challenge is extending Scratch and make it talk to the various boards and devices.</p>
 
-<h2>But How?</h2>
+<h2 id="but-how">But How?</h2>
 
 <p>Here is the architecture of the Scratch extension module. Note this is still under development by the Scratch team and is subject to change.</p>
 
-<p><img src="http://rexpie.github.io/assets/Scratch2.png" title="Scratch Architecture" alt="Scratch arch" /></p>
+<p><img src="http://rexpie.github.io/assets/Scratch2.png" alt="Scratch arch" title="Scratch Architecture" /></p>
 
 <p>You can also check the <a href="http://wiki.scratch.mit.edu/wiki/Scratch_Extension">official extension wiki</a> to get the latest updated info.</p>
 
-<h2>What else?</h2>
+<h2 id="what-else">What else?</h2>
 
 <p>As you can see in the architecture diagram, you will need a <strong>helper app</strong> to enable the communication as Scratch does not speak on channels other than the <code>HTTP</code> protocol.</p>
 
 <p>What you need is a third party, preferrably open sourced project to do that. Your helper app should act as an <code>HTTP proxy</code> and talk to Scratch <strong>AND</strong> it should also be able to talk to the board via serial ports.</p>
 
-<h2>All the Help You Can Get</h2>
+<h2 id="all-the-help-you-can-get">All the Help You Can Get</h2>
 
-<p>Let's take a look at some open source initiatives</p>
+<p>Let’s take a look at some open source initiatives</p>
 
 <ul>
-<li><a href="http://johnny-five.io">johnny-five</a></li>
-<li><a href="https://github.com/MrYsLab/s2a_fm">s2a_fm</a></li>
+  <li><a href="http://johnny-five.io">johnny-five</a></li>
+  <li><a href="https://github.com/MrYsLab/s2a_fm">s2a_fm</a></li>
 </ul>
 
+<p>Both projct is based on the <a href="http://firmata.org/">Firmata</a> protocol.</p>
 
-<p> Both projct is based on the <a href="http://firmata.org/">Firmata</a> protocol.</p>
-
-<h3>johnny-five</h3>
+<h3 id="johnny-five">johnny-five</h3>
 
 <p>This popular project is node-js based. Highly configurable, actively maintained and very popular. You can leverage the server module of the nodejs project and easily put together a helper app with very little code.</p>
 
 <p>Some sample code:</p>
 
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">five</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"johnny-five"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">five</span><span class="p">.</span><span class="nx">Board</span><span class="p">();</span></p>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">five</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"johnny-five"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">five</span><span class="p">.</span><span class="nx">Board</span><span class="p">();</span>
 
-<p><span class="nx">board</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"ready"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<span class="nx">board</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"ready"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">led</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">five</span><span class="p">.</span><span class="nx">Led</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>
   <span class="nx">led</span><span class="p">.</span><span class="nx">blink</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span>
-<span class="p">});</span></code></pre></figure></p>
+<span class="p">});</span></code></pre></figure>
 
-<h3>s2a_fm</h3>
+<h3 id="s2afm">s2a_fm</h3>
 
 <p>This project bases on PyMata, a firmata Python client. It already integrated the server request handling and Firmata communication. You can extend the existing modules within the framework relatively easily.</p>
 
@@ -128,9 +127,9 @@
 
 <p>You can choose whichever project you are comfortable with.</p>
 
-<h3>Final product</h3>
+<h3 id="final-product">Final product</h3>
 
-<p>Please checkout DFRobot's <a href="https://github.com/DFRobot/DFResources">DF4Scratch</a>. It combines all the stuff together and provides an easy way
+<p>Please checkout DFRobot’s <a href="https://github.com/DFRobot/DFResources">DF4Scratch</a>. It combines all the stuff together and provides an easy way
 to access Arduino via Scratch. It can also control the <a href="http://www.vortexbot.com">Vortex</a> robot.</p>
 
   </article>

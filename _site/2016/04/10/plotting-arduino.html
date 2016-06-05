@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Localizing Blockly</title>
-  <meta name="description" content="Localizing Blockly within WKwebView">
+  <title>Plotting Data From Arduino</title>
+  <meta name="description" content="Plotting Data from Arduino">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://rexpie.github.io/2015/11/23/localizing-blockly.html">
+  <link rel="canonical" href="http://rexpie.github.io/2016/04/10/plotting-arduino.html">
   <link rel="alternate" type="application/rss+xml" title="Rex's Blog" href="http://rexpie.github.io/feed.xml" />
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -67,133 +67,22 @@
         <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Localizing Blockly</h1>
-    <p class="post-meta">Nov 23, 2015</p>
+    <h1 class="post-title">Plotting Data From Arduino</h1>
+    <p class="post-meta">Apr 10, 2016</p>
   </header>
 
   <article class="post-content">
-    <h1 id="localizing-blockly-within-wkwebview">Localizing Blockly within WKwebView</h1>
+    <h1 id="plotting-data-from-arduino">Plotting Data from Arduino</h1>
 
-<h2 id="add-translation-for-blockly">Add translation for Blockly</h2>
-<p>Setup the block declaration code using Blockly.Msg.<localized_string> and prepare
-the language files under msg/json folder. When you compile blockly they will get
-compiled as well.</localized_string></p>
+<p>Debugging Arduino code is hard without support like J-tag. Most of the time we rely on serial logs.
+Since Arduino applications are loops in nature, the data naturally manifest itself with time-series properties.
+Charting and plotting data from Arduino would make a lot of debugging easier, compared to looking at the raw data from the serial monitor window.</p>
 
-<h2 id="import-translation-file-in-wkwebview">Import translation file in WKwebView</h2>
-<p>Now import that compiled language file. Of course we don’t want to hard-code so
-we setup the language in the localizable strings file:</p>
+<p>So I made a tool for plotting data from the serial port.</p>
 
-<p>In localizable.strings(Base):</p>
+<p>All of the tools and libs are ready-made, connecting the dots was great fun.</p>
 
-<p><code>
-  "language" = "en";
-</code></p>
-
-<p>In localizable.strings(Simplified Chinese):</p>
-
-<p><code>
-  "language" = "zh-hans";
-</code></p>
-
-<p>Then we can load the language property into the user script. Note we put this code
-at the <em>End</em> of the document so it overrides default language source.</p>
-
-<p><code>
-  let language = NSLocalizedString("language", comment:"")
-  if let languageJSPath = NSBundle.mainBundle().pathForResource(language, ofType: "js", inDirectory: "blockly/msg/js") {
-    do {
-        let languageJS = try NSString(contentsOfFile: languageJSPath, encoding: NSUTF8StringEncoding) as String
-        let languageScript = WKUserScript(source: languageJS, injectionTime: .AtDocumentEnd, forMainFrameOnly: true)
-        userContentController.addUserScript(languageScript)
-    } catch {
-        print("Cannot load lang file")
-    }
-  }
-</code></p>
-
-<h2 id="localizing-html">Localizing HTML</h2>
-
-<p>Next we should localize HTML elements.</p>
-
-<p><a href="http://www.localeplanet.com/support/howto-localize-js.html">This article</a> is
-good practice for JS based dynamic localization. I followed it with a few tweaks.</p>
-
-<h3 id="localizing-blockly-toolbox">Localizing Blockly Toolbox</h3>
-
-<p>Blockly Toolbox is defined in the HTML page using XML element. Then <code>toolbox.js</code> waltzes
-in and dynamically creates a virtual dom. So we should go into the code and intercept
- the creation.</p>
-
-<p>In <code>toolbox.js</code>, in function <code>Blockly.Toolbox.prototype.populate_</code>, make the
-following change:</p>
-
-<p><code>
- var childOut = rootOut.createNode(_(childIn.getAttribute('name')));
-</code></p>
-
-<p>Then use these regex on your HTML to mark the strings:</p>
-
-<p><code>
-find regex:   category name="([^"]*)"
-replace with: category name="_('$1')"
-</code></p>
-
-<p>Then use gettext to generate the <code>po</code> file:</p>
-
-<p><code>
-xgettext.pl apps/blocklyduino/BigBee.html
-</code></p>
-
-<p>Use the tools of your choice to translate.</p>
-
-<p>After that, you can generate the messages file using:</p>
-
-<p><code>
-po2js.py messages.po
-</code></p>
-
-<p>This creates a messages.js file that you can directly embed in
-your HTML:</p>
-
-<p><code>
-&lt;script type="text/javascript" src="../../translate_compressed.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="../../messages.js"&gt;&lt;/script&gt;
-</code></p>
-
-<p>You may need to install the <code>polib</code> for <code>python</code>:</p>
-
-<p><code>
-pip install polib
-</code></p>
-
-<p>You might wonder,
-&gt; But how do we dynamically choose which file should we use for
-translation?</p>
-
-<p>Luckly, WKwebView has the <code>navigation.language</code> property that we
-can use. We can add this snippet to the translation file:</p>
-
-<p><code>
-var translate = function(text) {
-  if (!navigator.language || navigator.language === "en-us") {
-    return text;
-  }
-</code></p>
-
-<p>As for the other elements in the HTML file, we can use this
-pattern:</p>
-
-<p><code>
-var buttons = ['btnUpload', 'btnLoadExample', 'btnDiscard'];
-buttons.map(function(buttonId){
-  document.getElementById(buttonId).innerHTML = _(document.getElementById(buttonId).innerHTML);
-});
-</code></p>
-
-<h3 id="optional">Optional</h3>
-
-<p>You can use
-<a href="http://closure-compiler.appspot.com/home">this link</a> to compile/compress your js code.</p>
+<p>https://github.com/DFRobot/DFSerialChart</p>
 
   </article>
 

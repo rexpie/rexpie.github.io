@@ -74,68 +74,69 @@
   <article class="post-content">
     <p>In the previous post I said it would be more expensive to implement a Firmata based approach. I was wrong. Firmata SYSEX command set is quite easy to extend actually.</p>
 
-<h1>Extending Firmata on Arduino</h1>
+<h1 id="extending-firmata-on-arduino">Extending Firmata on Arduino</h1>
 
 <p>I was strolling on google when a wild <a href="http://blog.s4a.cat/2015/03/13/Extending-Firmata-for-Snap4Arduino.html">tutorial</a> appears. Thanks to this piece of example which encouraged me to give Firmata a try.</p>
 
-<p>I was previously looking at Johnny-five's code and was properly scared off. The complexity is just too damn high.</p>
+<p>I was previously looking at Johnny-five’s code and was properly scared off. The complexity is just too damn high.</p>
 
 <p>However we are not toying with Johnny-five this time, just plain old Firmata.</p>
 
 <p>First we open up the StandardFirmata ino file and insert this code:</p>
 
-<p><figure class="highlight"><pre><code class="language-c--" data-lang="c++">    <span class="k">case</span> <span class="mh">0x08</span><span class="p">:</span>
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++">    <span class="k">case</span> <span class="mh">0x08</span><span class="p">:</span>
       <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">START_SYSEX</span><span class="p">);</span>
       <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="mh">0x08</span><span class="p">);</span>
       <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
       <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">readCapacitivePin</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]));</span>
       <span class="n">Firmata</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">END_SYSEX</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span></code></pre></figure></p>
+      <span class="k">break</span><span class="p">;</span></code></pre></figure>
 
 <p>Also insert the readCapacitivePin function to the end of the file. You can find the code in <a href="http://playground.arduino.cc/Code/CapacitiveSensor">this post</a>.</p>
 
-<h1>Extending Firmata Nodejs client</h1>
+<h1 id="extending-firmata-nodejs-client">Extending Firmata Nodejs client</h1>
 
 <p>You can get your firmata module from npm.</p>
 
 <p>Once you have installed the module, go to its directory and find <code>lib/firmata.js</code>.
 Add the following code:</p>
 
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">PIN_CAPACITANCE</span> <span class="o">=</span> <span class="mh">0x08</span><span class="p">;</span></p>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">PIN_CAPACITANCE</span> <span class="o">=</span> <span class="mh">0x08</span><span class="p">;</span>
 
-<p><span class="nx">SYSEX_RESPONSE</span><span class="p">[</span><span class="nx">PIN_CAPACITANCE</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">board</span><span class="p">){</span>
+<span class="nx">SYSEX_RESPONSE</span><span class="p">[</span><span class="nx">PIN_CAPACITANCE</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">board</span><span class="p">){</span>
   <span class="kd">var</span> <span class="nx">pin</span> <span class="o">=</span> <span class="nx">board</span><span class="p">.</span><span class="nx">currentBuffer</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
   <span class="kd">var</span> <span class="nx">cap</span> <span class="o">=</span> <span class="nx">board</span><span class="p">.</span><span class="nx">currentBuffer</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
  <span class="c1">// console.log(board.currentBuffer.toString("hex"));</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">board</span><span class="p">.</span><span class="nx">pins</span><span class="p">[</span><span class="nx">pin</span><span class="p">]){</span>
     <span class="nx">board</span><span class="p">.</span><span class="nx">pins</span><span class="p">[</span><span class="nx">pin</span><span class="p">].</span><span class="nx">cap</span> <span class="o">=</span> <span class="nx">cap</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span></p>
+<span class="p">}</span>
 
-<p><span class="nx">Board</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">queryPinCapacitance</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pin</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">Board</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">queryPinCapacitance</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pin</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">transport</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="k">new</span> <span class="nx">Buffer</span><span class="p">([</span><span class="nx">START_SYSEX</span><span class="p">,</span> <span class="nx">PIN_CAPACITANCE</span><span class="p">,</span> <span class="nx">pin</span><span class="p">,</span> <span class="nx">END_SYSEX</span><span class="p">]));</span>
-<span class="p">};</span></code></pre></figure></p>
+<span class="p">};</span></code></pre></figure>
 
-<h1>Testing</h1>
+<h1 id="testing">Testing</h1>
 
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span></p>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
 
-<p><span class="kd">var</span> <span class="nx">firmata</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./lib/firmata.js'</span><span class="p">),</span>
-    <span class="nx">repl</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'repl'</span><span class="p">);</span></p>
+<span class="kd">var</span> <span class="nx">firmata</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./lib/firmata.js'</span><span class="p">),</span>
+    <span class="nx">repl</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'repl'</span><span class="p">);</span>
 
-<p><span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Arduino COM ports usually have the manufacturer name start with "Arduino"</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">"arduino"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">defaultPort</span> <span class="o">=</span> <span class="nx">port</span><span class="p">.</span><span class="nx">comName</span><span class="p">;</span>
-            <span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">firmata</span><span class="p">.</span><span class="nx">Board</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Successfully Connected to '</span> <span class="o">+</span> <span class="nx">defaultPort</span><span class="p">);</span>
-                <span class="nx">repl</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="s1">'firmata&gt;'</span><span class="p">).</span><span class="nx">context</span><span class="p">.</span><span class="nx">board</span> <span class="o">=</span> <span class="nx">board</span><span class="p">;</span>
-            <span class="p">});</span>
+		    <span class="kd">var</span> <span class="nx">board</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">firmata</span><span class="p">.</span><span class="nx">Board</span><span class="p">(</span><span class="nx">defaultPort</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+		        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Successfully Connected to '</span> <span class="o">+</span> <span class="nx">defaultPort</span><span class="p">);</span>
+		        <span class="nx">repl</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="s1">'firmata&gt;'</span><span class="p">).</span><span class="nx">context</span><span class="p">.</span><span class="nx">board</span> <span class="o">=</span> <span class="nx">board</span><span class="p">;</span>
+		    <span class="p">});</span>
         <span class="p">}</span>
     <span class="p">});</span>
-<span class="p">});</span></code></pre></figure></p>
+<span class="p">});</span></code></pre></figure>
 
 <p>You can type in board.queryPinCapacitance(13) and try it out. Board setup is easy:</p>
 
@@ -143,19 +144,19 @@ Add the following code:</p>
 
 <p>Image curtesy to Arduino</p>
 
-<h1>Firmataized Fruit Piano</h1>
+<h1 id="firmataized-fruit-piano">Firmataized Fruit Piano</h1>
 
 <p>Here is your Helper App code</p>
 
-<p><figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">serialPort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"serialport"</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">firmata</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"firmata"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span></p>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
 
-<p><span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">defaultPort</span><span class="p">;</span>
 <span class="c1">// holding the values of each port in a map, updated continuously</span>
-<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span></p>
+<span class="kd">var</span> <span class="nx">fruits</span> <span class="o">=</span> <span class="p">{};</span>
 
-<p><span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">serialPort</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">ports</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">ports</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Arduino COM ports usually have the manufacturer name start with "Arduino"</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">port</span><span class="p">.</span><span class="nx">manufacturer</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">"arduino"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
@@ -169,37 +170,33 @@ Add the following code:</p>
                     <span class="p">}</span>
                 <span class="p">},</span> <span class="mi">1</span><span class="p">);</span>
             <span class="p">});</span>
-        <span class="p">}</span></p>
+        <span class="p">}</span>
 
-<pre><code>&lt;span class="p"&gt;});&lt;/span&gt;
-</code></pre>
+    <span class="p">});</span>
+<span class="p">});</span>
 
-<p><span class="p">});</span></p>
-
-<p><span class="c1">// global http server</span>
+<span class="c1">// global http server</span>
 <span class="kd">var</span> <span class="nx">server</span><span class="p">;</span>
-<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span></p>
+<span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
 
-<pre><code>&lt;span class="c1"&gt;// start recording request entry time&lt;/span&gt;
+    <span class="c1">// start recording request entry time</span>
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s1"&gt;'/poll'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// not poll&lt;/span&gt;
-    &lt;span class="c1"&gt;// print non-polling command sent by Scratch       &lt;/span&gt;
+    <span class="k">if</span> <span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="s1">'/poll'</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// not poll</span>
+        <span class="c1">// print non-polling command sent by Scratch		</span>
 
-&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// Polling&lt;/span&gt;
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// Polling</span>
 
-    &lt;span class="nb"&gt;Object&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;keys&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;forEach&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;pinName&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"capacity/"&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;pinName&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;" "&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;fruits&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;pinName&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;"\n"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="p"&gt;});&lt;/span&gt;
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">fruits</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">pinName</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"capacity/"</span> <span class="o">+</span> <span class="nx">pinName</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="nx">fruits</span><span class="p">[</span><span class="nx">pinName</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"\n"</span><span class="p">);</span>
+        <span class="p">});</span>
 
-&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="c1"&gt;// end if&lt;/span&gt;
+    <span class="p">}</span> <span class="c1">// end if</span>
 
-&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;end&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
-</code></pre>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span></code></pre></figure>
 
-<p><span class="p">});</span>
-<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">23456</span><span class="p">);</span></code></pre></figure></p>
-
-<h1>Ready to Go</h1>
+<h1 id="ready-to-go">Ready to Go</h1>
 
 <p>You can just use the Scratch project in the previous Fruit Piano Scratch project. The Scratch project is athogonal to our Helper App implementation hence no change is needed.</p>
 
