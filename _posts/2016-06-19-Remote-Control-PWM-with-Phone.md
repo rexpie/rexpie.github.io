@@ -11,6 +11,7 @@ Motion based projects are fun. There are a few gyro and accelerometer that works
 they are not free. However most phones comes with those sensors and we are going to take advantage
 of that - making a remotely controlled PWM pin with your phone.
 
+[![image]({{ site.url }}/assets/remotePWM.png )](https://youtu.be/R54YdTUsqu8)
 
 # System Environments
 
